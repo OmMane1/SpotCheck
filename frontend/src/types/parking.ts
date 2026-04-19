@@ -24,8 +24,8 @@ export interface RecommendationResult {
   risk_warnings: string[];
   rule_summary: string;
   pricing: string;
-  // TODO: ask backend partner to add these fields to RecommendationResult
-  // so segments can be drawn on the map (1-line change in models.py + service.py)
+  max_duration_minutes: number;
+  permit_required: boolean;
   center?: LatLng;
   polyline?: LatLng[];
 }

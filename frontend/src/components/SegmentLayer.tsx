@@ -1,5 +1,5 @@
 import L from "leaflet";
-import { Marker, Tooltip } from "react-leaflet";
+import { Marker, Popup } from "react-leaflet";
 import type { RecommendationResult } from "../types/parking";
 import { scoreToColor, scoreToLabel, rankLabel } from "../utils/colors";
 
@@ -34,11 +34,18 @@ function createPinIcon(rank: number, color: string, isSelected: boolean) {
       font-family:system-ui,sans-serif;
       box-shadow:${shadow};
       cursor:pointer;
-      transition:transform 0.1s;
     ">${rank + 1}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
+}
+
+function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h (${minutes} min)`;
+  return `${h}h ${m}m (${minutes} min)`;
 }
 
 export default function SegmentLayer({ results, selectedId, onSelect }: SegmentLayerProps) {
@@ -59,13 +66,26 @@ export default function SegmentLayer({ results, selectedId, onSelect }: SegmentL
             eventHandlers={{ click: () => onSelect(result.segment_id) }}
             zIndexOffset={isSelected ? 1000 : index * -1}
           >
-            <Tooltip direction="top" offset={[0, -20]}>
-              <strong>{result.street_name}</strong>
-              <br />
-              {rankLabel(index)} · {scoreToLabel(result.score)}
-              <br />
-              {result.pricing} · ~{result.walk_minutes} min walk
-            </Tooltip>
+            <Popup className="pin-popup" closeButton={false} offset={[0, -20]}>
+              <div className="pin-popup-inner">
+                <div className="pin-popup-header">
+                  <span className="pin-popup-rank" style={{ color }}>
+                    {rankLabel(index)}
+                  </span>
+                  <span className="pin-popup-label" style={{ background: color }}>
+                    {scoreToLabel(result.score)}
+                  </span>
+                </div>
+                <p className="pin-popup-street">{result.street_name}</p>
+                <p className="pin-popup-cross">{result.from_street} → {result.to_street}</p>
+                <div className="pin-popup-meta">
+                  <span>🚶 ~{result.walk_minutes} min</span>
+                  <span>💰 {result.pricing}</span>
+                  <span>⏱ {formatDuration(result.max_duration_minutes)}</span>
+                </div>
+                <p className="pin-popup-hint">See full details in the sidebar →</p>
+              </div>
+            </Popup>
           </Marker>
         );
       })}

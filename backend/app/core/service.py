@@ -47,6 +47,9 @@ class ParkingRecommendationService:
             walk_minutes = estimate_walk_minutes(distance_meters)
             score = calculate_score(segment, distance_meters, evaluation.risk_score)
 
+            active_window = next(
+                (w for w in segment.rules.time_windows if w.parking_allowed), None
+            )
             results.append(
                 RecommendationResult(
                     segment_id=segment.id,
@@ -60,6 +63,8 @@ class ParkingRecommendationService:
                     risk_warnings=evaluation.risk_warnings,
                     rule_summary=evaluation.rule_summary,
                     pricing=evaluation.pricing,
+                    max_duration_minutes=segment.rules.max_duration_minutes,
+                    permit_required=active_window.permit_required if active_window else False,
                     center=segment.center,
                     polyline=segment.polyline,
                 )

@@ -37,7 +37,7 @@ export default function RuleCard({ result, rank, onClose, onBack }: RuleCardProp
           <MetaItem label="Distance" value={`${Math.round(result.distance_meters)}m`} />
           <MetaItem label="Cost" value={result.pricing} />
         </div>
-        <p className="rule-card-rule-summary">{result.rule_summary}</p>
+        <RuleBullets result={result} />
       </div>
 
       {result.why_good.length > 0 && (
@@ -77,6 +77,31 @@ function ScoreBar({ score, color }: { score: number; color: string }) {
         />
       ))}
     </div>
+  );
+}
+
+function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${minutes} min`;
+  if (m === 0) return `${h}h (${minutes} min)`;
+  return `${h}h ${m}m (${minutes} min)`;
+}
+
+function RuleBullets({ result }: { result: RecommendationResult }) {
+  const isMetered = result.pricing !== "Free";
+  const bullets = [
+    isMetered ? `Metered · ${result.pricing}` : "Free parking",
+    `Max stay: ${formatDuration(result.max_duration_minutes)}`,
+    result.permit_required ? "Resident permit required" : "No permit required",
+  ];
+
+  return (
+    <ul className="rule-bullets">
+      {bullets.map((b, i) => (
+        <li key={i}>{b}</li>
+      ))}
+    </ul>
   );
 }
 

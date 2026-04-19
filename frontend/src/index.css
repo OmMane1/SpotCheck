@@ -620,3 +620,93 @@ body {
   gap: 4px;
   color: var(--text);
 }
+
+/* ── Rule bullets (structured parking info) ──────── */
+
+.rule-bullets {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--text);
+  list-style: disc;
+}
+
+/* ── Pin popup ───────────────────────────────────── */
+
+.pin-popup .leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: 0;
+}
+
+.pin-popup .leaflet-popup-content {
+  margin: 0;
+  min-width: 200px;
+}
+
+.pin-popup .leaflet-popup-tip-container {
+  margin-top: -1px;
+}
+
+.pin-popup-inner {
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pin-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.pin-popup-rank {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pin-popup-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pin-popup-street {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.pin-popup-cross {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pin-popup-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.pin-popup-hint {
+  font-size: 11px;
+  color: var(--accent);
+  margin: 4px 0 0;
+  font-style: italic;
+}

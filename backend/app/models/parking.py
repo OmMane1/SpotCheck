@@ -93,6 +93,8 @@ class RecommendationResult(BaseModel):
     risk_warnings: list[str]
     rule_summary: str
     pricing: str
+    max_duration_minutes: int
+    permit_required: bool
     center: LatLng
     polyline: list[LatLng] = Field(default_factory=list)
 

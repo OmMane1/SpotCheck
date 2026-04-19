@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -8,13 +9,11 @@ const FENWAY_CENTER: [number, number] = [42.3467, -71.0972];
 const DEFAULT_ZOOM = 17;
 const MIN_ZOOM = 16;
 const MAX_ZOOM = 18;
-// Tight bounds — keeps view inside Fenway, blocks Cambridge/South End drift
 const FENWAY_BOUNDS: [[number, number], [number, number]] = [
   [42.340, -71.106],
   [42.355, -71.085],
 ];
 
-// Blue circle icon for the destination — avoids Leaflet's broken default icon path in Vite
 const destinationIcon = L.divIcon({
   className: "",
   html: `<div style="
@@ -31,6 +30,7 @@ const destinationIcon = L.divIcon({
 interface MapProps {
   results: RecommendationResult[];
   selectedId: string | null;
+  selectedResult: RecommendationResult | null;
   destination: LatLng | null;
   onSegmentSelect: (id: string) => void;
 }
@@ -43,7 +43,18 @@ function MapRecenter({ destination }: { destination: LatLng | null }) {
   return null;
 }
 
-export default function Map({ results, selectedId, destination, onSegmentSelect }: MapProps) {
+// Flies to a selected pin whenever selectedResult changes
+function MapFlyTo({ result }: { result: RecommendationResult | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (result?.center) {
+      map.flyTo([result.center.lat, result.center.lng], 18, { duration: 0.4 });
+    }
+  }, [result?.segment_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
+export default function Map({ results, selectedId, selectedResult, destination, onSegmentSelect }: MapProps) {
   return (
     <div className="map-wrapper">
       <MapContainer
@@ -62,6 +73,7 @@ export default function Map({ results, selectedId, destination, onSegmentSelect 
         />
 
         <MapRecenter destination={destination} />
+        <MapFlyTo result={selectedResult} />
 
         {destination && (
           <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} />
@@ -90,17 +102,23 @@ function Legend() {
     <div className="map-legend">
       {items.map(({ color, label }) => (
         <div key={label} className="legend-item">
-          <svg width="24" height="6">
-            <line x1="0" y1="3" x2="24" y2="3" stroke={color} strokeWidth="4" strokeLinecap="round" />
-          </svg>
+          <div style={{
+            width: 20, height: 20, background: color,
+            border: "2px solid white", borderRadius: "50%",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.3)", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 9, fontWeight: 800, color: "white",
+          }}>
+            {items.indexOf({ color, label }) + 1}
+          </div>
           <span>{label}</span>
         </div>
       ))}
       <div className="legend-item">
         <div style={{
-          width: 12, height: 12, background: "#2563eb",
+          width: 14, height: 14, background: "#2563eb",
           border: "2px solid white", borderRadius: "50%",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.3)", flexShrink: 0
+          boxShadow: "0 1px 4px rgba(0,0,0,0.3)", flexShrink: 0,
         }} />
         <span>Your destination</span>
       </div>

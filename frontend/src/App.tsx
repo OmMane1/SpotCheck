@@ -76,6 +76,7 @@ export default function App() {
         <Map
           results={results?.results ?? []}
           selectedId={selectedId}
+          selectedResult={selectedResult}
           destination={destination}
           onSegmentSelect={handleSegmentSelect}
         />
