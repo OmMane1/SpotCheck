@@ -76,7 +76,10 @@ export default function SegmentLayer({
                   <span className="pin-popup-rank" style={{ color }}>
                     {rankLabel(index)}
                   </span>
-                  <span className="pin-popup-label" style={{ background: color }}>
+                  <span
+                    className="pin-popup-label"
+                    style={{ background: color }}
+                  >
                     {scoreToLabel(result.score)}
                   </span>
                 </div>
@@ -87,9 +90,13 @@ export default function SegmentLayer({
                 <div className="pin-popup-meta">
                   <span>Walk ~{result.walk_minutes} min</span>
                   <span>Cost {result.pricing}</span>
-                  <span>Limit {formatDuration(result.max_duration_minutes)}</span>
+                  <span>
+                    Limit {formatDuration(result.max_duration_minutes)}
+                  </span>
                 </div>
-                <p className="pin-popup-hint">See full details in the sidebar</p>
+                <p className="pin-popup-hint">
+                  See full details in the sidebar →
+                </p>
               </div>
             </Popup>
           </Marker>

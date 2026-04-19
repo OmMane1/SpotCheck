@@ -1,21 +1,46 @@
+import { useState } from "react";
 import type { RecommendationResult } from "../types/parking";
 import { scoreToColor, scoreToLabel, rankLabel } from "../utils/colors";
 
 interface RuleCardProps {
   result: RecommendationResult;
   rank: number;
+  arrivalTime: string | null;
   onClose: () => void;
   onBack: () => void;
+}
+
+function computeDestArrival(parkISO: string, walkMinutes: number): string {
+  const d = new Date(parkISO);
+  d.setMinutes(d.getMinutes() + walkMinutes);
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function buildAddress(result: RecommendationResult): string {
+  return `${result.street_name} between ${result.from_street} and ${result.to_street}, Boston, MA`;
 }
 
 export default function RuleCard({
   result,
   rank,
+  arrivalTime,
   onClose,
   onBack,
 }: RuleCardProps) {
   const color = scoreToColor(result.score);
   const label = scoreToLabel(result.score);
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(buildAddress(result)).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const navigateUrl = result.center
+    ? `https://www.google.com/maps/dir/?api=1&destination=${result.center.lat},${result.center.lng}&travelmode=walking`
+    : null;
 
   return (
     <div className="rule-card">
@@ -38,14 +63,40 @@ export default function RuleCard({
             {rankLabel(rank)} - {label}
           </span>
         </div>
+        <div className="rule-card-actions">
+          {navigateUrl && (
+            <a
+              href={navigateUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="action-btn action-btn--navigate"
+            >
+              Navigate →
+            </a>
+          )}
+          <button className="action-btn action-btn--copy" onClick={handleCopy}>
+            {copied ? "Copied!" : "Copy address"}
+          </button>
+        </div>
       </div>
 
       <div className="rule-card-section">
         <div className="rule-card-meta">
           <MetaItem label="Walk" value={`~${result.walk_minutes} min`} />
-          <MetaItem label="Distance" value={`${Math.round(result.distance_meters)}m`} />
+          <MetaItem
+            label="Distance"
+            value={`${Math.round(result.distance_meters)}m`}
+          />
           <MetaItem label="Cost" value={result.pricing} />
         </div>
+        {arrivalTime && (
+          <p className="rule-card-arrival">
+            Reach destination by{" "}
+            <strong>
+              {computeDestArrival(arrivalTime, result.walk_minutes)}
+            </strong>
+          </p>
+        )}
         <RuleBullets result={result} />
       </div>
 
