@@ -68,7 +68,13 @@ export default function SegmentLayer({ results, selectedId, onSelect }: SegmentL
           >
             <Popup className="pin-popup" closeButton={false} offset={[0, -20]}>
               <div className="pin-popup-inner">
-<div className="pin-popup-header">
+                <img
+                  className="pin-popup-map"
+                  src={`https://staticmap.openstreetmap.de/staticmap.php?center=${result.center.lat},${result.center.lng}&zoom=18&size=260x120&markers=${result.center.lat},${result.center.lng},red-pushpin`}
+                  alt="Area map"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+                <div className="pin-popup-header">
                   <span className="pin-popup-rank" style={{ color }}>
                     {rankLabel(index)}
                   </span>
