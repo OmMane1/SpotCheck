@@ -1,0 +1,35 @@
+{
+  "source": "manual_demand_proxy",
+  "segments": [
+    {
+      "id": "fenway-004",
+      "nearby_demand": {
+        "traffic_level": 0.5,
+        "poi_level": 0.58,
+        "notes": "Manually adjusted to reflect quieter residential demand."
+      },
+      "source_notes": [
+        {
+          "source": "manual_demand_proxy",
+          "kind": "demand_enrichment",
+          "detail": "Placeholder demand enrichment; swap later with Google Places or similar."
+        }
+      ]
+    },
+    {
+      "id": "fenway-008",
+      "nearby_demand": {
+        "traffic_level": 0.93,
+        "poi_level": 0.98,
+        "notes": "Manual proxy for heavy event-day and venue-adjacent demand."
+      },
+      "source_notes": [
+        {
+          "source": "manual_demand_proxy",
+          "kind": "demand_enrichment",
+          "detail": "Placeholder demand enrichment; swap later with Google Places or similar."
+        }
+      ]
+    }
+  ]
+}

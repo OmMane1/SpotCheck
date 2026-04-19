@@ -1,23 +1,28 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from app.core.ranking import calculate_distance_meters, calculate_score, estimate_walk_minutes
 from app.core.rules import evaluate_segment
+from app.data_access.repository import ParkingDataRepository
 from app.models.parking import (
     ParkingRecommendationRequest,
     RecommendationResult,
     RecommendationsResponse,
-    SegmentCollection,
 )
 
 
 class ParkingRecommendationService:
-    def __init__(self, dataset_path: Path | None = None) -> None:
-        default_path = Path(__file__).resolve().parent.parent / "data" / "fenway_segments.json"
-        self.dataset_path = dataset_path or default_path
-        self.collection = self._load_collection()
+    def __init__(
+        self,
+        dataset_path: Path | None = None,
+        enrichments_dir: Path | None = None,
+    ) -> None:
+        self.repository = ParkingDataRepository(
+            dataset_path=dataset_path,
+            enrichments_dir=enrichments_dir,
+        )
+        self.collection = self.repository.load_collection()
 
     def get_recommendations(
         self, request: ParkingRecommendationRequest
@@ -68,8 +73,3 @@ class ParkingRecommendationService:
             results=top_results,
             message=message,
         )
-
-    def _load_collection(self) -> SegmentCollection:
-        with self.dataset_path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-        return SegmentCollection.model_validate(payload)

@@ -1,0 +1,30 @@
+{
+  "source": "Boston Open Data",
+  "segments": [
+    {
+      "id": "fenway-001",
+      "last_verified_at": "2026-04-19T12:30:00-04:00",
+      "source_notes": [
+        {
+          "source": "boston_open_data",
+          "kind": "rules_enrichment",
+          "detail": "Placeholder Boston rules enrichment file for offline/manual updates."
+        }
+      ]
+    },
+    {
+      "id": "fenway-010",
+      "rules": {
+        "max_duration_minutes": 120
+      },
+      "last_verified_at": "2026-04-19T12:30:00-04:00",
+      "source_notes": [
+        {
+          "source": "boston_open_data",
+          "kind": "rules_enrichment",
+          "detail": "Permit-only rule kept explicit to mirror likely curb restrictions."
+        }
+      ]
+    }
+  ]
+}
