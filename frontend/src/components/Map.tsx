@@ -5,12 +5,13 @@ import SegmentLayer from "./SegmentLayer";
 import type { RecommendationResult, LatLng } from "../types/parking";
 
 const FENWAY_CENTER: [number, number] = [42.3467, -71.0972];
-const DEFAULT_ZOOM = 15;
-const MIN_ZOOM = 14;
+const DEFAULT_ZOOM = 16;
+const MIN_ZOOM = 15;
 const MAX_ZOOM = 18;
+// Tight bounds — keeps view inside Fenway, blocks Cambridge/South End drift
 const FENWAY_BOUNDS: [[number, number], [number, number]] = [
-  [42.336, -71.112],
-  [42.358, -71.082],
+  [42.340, -71.106],
+  [42.355, -71.085],
 ];
 
 // Blue circle icon for the destination — avoids Leaflet's broken default icon path in Vite
