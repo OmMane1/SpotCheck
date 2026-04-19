@@ -19,11 +19,13 @@ export default function App() {
   const [formCollapsed, setFormCollapsed] = useState(false);
   const [destination, setDestination] = useState<LatLng | null>(null);
   const [parkingFilter, setParkingFilter] = useState<ParkingFilter>("any");
+  const [arrivalTime, setArrivalTime] = useState<string | null>(null);
 
   function handleSearch(request: RecommendationRequest) {
     setSelectedId(null);
     setFormCollapsed(true);
     setDestination(request.destination);
+    setArrivalTime(request.arrival_time);
     search(request);
   }
 
@@ -74,6 +76,7 @@ export default function App() {
           <RuleCard
             result={selectedResult}
             rank={selectedRank}
+            arrivalTime={arrivalTime}
             onBack={handleBack}
             onClose={handleClose}
           />
@@ -82,6 +85,7 @@ export default function App() {
             results={filteredResults}
             rejectionReasons={results.rejection_reasons}
             selectedId={selectedId}
+            arrivalTime={arrivalTime}
             onSelect={setSelectedId}
           />
         ) : null}
