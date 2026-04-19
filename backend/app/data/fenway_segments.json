@@ -47,7 +47,15 @@
         "traffic_level": 0.85,
         "poi_level": 0.95,
         "notes": "Very close to Fenway Park and major food spots."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-002",
@@ -94,7 +102,15 @@
         "traffic_level": 0.8,
         "poi_level": 0.85,
         "notes": "Popular game-day walking route."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-003",
@@ -141,7 +157,15 @@
         "traffic_level": 0.75,
         "poi_level": 0.8,
         "notes": "Retail activity with consistent demand."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-004",
@@ -195,7 +219,15 @@
         "traffic_level": 0.55,
         "poi_level": 0.6,
         "notes": "More residential feel with moderate restaurant demand."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-005",
@@ -242,7 +274,15 @@
         "traffic_level": 0.65,
         "poi_level": 0.7,
         "notes": "Steady traffic with some park and museum visitors."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-006",
@@ -296,7 +336,15 @@
         "traffic_level": 0.68,
         "poi_level": 0.78,
         "notes": "Dining corridor with moderate turnover."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-007",
@@ -343,7 +391,15 @@
         "traffic_level": 0.45,
         "poi_level": 0.5,
         "notes": "Lower traffic than Boylston or Brookline."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-008",
@@ -390,7 +446,15 @@
         "traffic_level": 0.9,
         "poi_level": 0.95,
         "notes": "One of the highest-demand blocks in the dataset."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-009",
@@ -437,7 +501,15 @@
         "traffic_level": 0.82,
         "poi_level": 0.88,
         "notes": "Active nightlife and stadium overflow."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     },
     {
       "id": "fenway-010",
@@ -484,7 +556,15 @@
         "traffic_level": 0.92,
         "poi_level": 0.97,
         "notes": "Extremely high event and nightlife demand."
-      }
+      },
+      "source_notes": [
+        {
+          "source": "curated",
+          "kind": "base_dataset",
+          "detail": "Initial Fenway hackathon segment curated from planned street list."
+        }
+      ],
+      "last_verified_at": "2026-04-19T12:00:00-04:00"
     }
   ]
 }

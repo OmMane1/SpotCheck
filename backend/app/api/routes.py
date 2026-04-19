@@ -8,8 +8,8 @@ service = ParkingRecommendationService()
 
 
 @router.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "service": "fenway-parking-api"}
+def health() -> dict[str, object]:
+    return service.health_snapshot()
 
 
 @router.post("/recommendations", response_model=RecommendationsResponse)

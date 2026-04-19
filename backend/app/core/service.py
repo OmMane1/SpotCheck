@@ -1,23 +1,35 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
+from app.config import Settings, get_settings
 from app.core.ranking import calculate_distance_meters, calculate_score, estimate_walk_minutes
 from app.core.rules import evaluate_segment
+from app.data_access.repository import ParkingDataRepository
 from app.models.parking import (
     ParkingRecommendationRequest,
     RecommendationResult,
     RecommendationsResponse,
-    SegmentCollection,
 )
 
 
 class ParkingRecommendationService:
-    def __init__(self, dataset_path: Path | None = None) -> None:
-        default_path = Path(__file__).resolve().parent.parent / "data" / "fenway_segments.json"
-        self.dataset_path = dataset_path or default_path
-        self.collection = self._load_collection()
+    def __init__(
+        self,
+        dataset_path: Path | None = None,
+        enrichments_dir: Path | None = None,
+        settings: Settings | None = None,
+    ) -> None:
+        self.settings = settings or get_settings()
+        self.repository = ParkingDataRepository(
+            dataset_path=dataset_path,
+            enrichments_dir=enrichments_dir,
+            settings=self.settings,
+        )
+        self.collection = self.repository.load_collection()
+
+    def refresh_collection(self) -> None:
+        self.collection = self.repository.load_collection()
 
     def get_recommendations(
         self, request: ParkingRecommendationRequest
@@ -69,7 +81,17 @@ class ParkingRecommendationService:
             message=message,
         )
 
-    def _load_collection(self) -> SegmentCollection:
-        with self.dataset_path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-        return SegmentCollection.model_validate(payload)
+    def health_snapshot(self) -> dict[str, object]:
+        report = self.repository.last_refresh_report
+        return {
+            "status": "ok",
+            "service": "fenway-parking-api",
+            "data_refresh": {
+                "enabled": report.refresh_enabled,
+                "succeeded": report.refresh_succeeded,
+                "used_fallback": report.used_fallback,
+                "refreshed_at": report.refreshed_at,
+                "sources_checked": report.sources_checked,
+                "errors": report.errors,
+            },
+        }
