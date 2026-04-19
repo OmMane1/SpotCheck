@@ -37,6 +37,12 @@ class NearbyDemand(BaseModel):
     notes: str
 
 
+class SourceNote(BaseModel):
+    source: str
+    kind: str
+    detail: str
+
+
 class SegmentRules(BaseModel):
     max_duration_minutes: int
     metered: bool
@@ -58,6 +64,8 @@ class ParkingSegment(BaseModel):
     base_score_modifier: float = 0.0
     rules: SegmentRules
     nearby_demand: NearbyDemand
+    source_notes: list[SourceNote] = Field(default_factory=list)
+    last_verified_at: datetime | None = None
 
 
 class SegmentCollection(BaseModel):
