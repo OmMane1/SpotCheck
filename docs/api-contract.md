@@ -57,3 +57,4 @@
 - Ranking is heuristic-only and combines walking distance, rule risk, and static demand.
 - Empty-result responses still return HTTP 200 with an empty `results` array and a helpful `message`.
 - External data enrichments are offline and optional; they should never change the request or response contract.
+- The `GET /health` response includes startup refresh status for Boston public data sources.
