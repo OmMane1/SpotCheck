@@ -2,6 +2,11 @@
   "framework": null,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
+  "build": {
+    "env": {
+      "UV_PYTHON": "3.12"
+    }
+  },
   "routes": [
     { "src": "/health", "dest": "/api/index" },
     { "src": "/recommendations", "dest": "/api/index" },
