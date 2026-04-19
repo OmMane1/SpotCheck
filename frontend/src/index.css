@@ -243,6 +243,178 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
+/* ── Search summary bar (collapsed form) ─────────── */
+
+.search-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.search-summary:hover {
+  background: #f1f5f9;
+}
+
+.search-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.search-summary-dest {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-summary-details {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.search-summary-edit {
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Sidebar loading ─────────────────────────────── */
+
+.sidebar-loading {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Results list ────────────────────────────────── */
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.results-list-header {
+  padding: 10px 16px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-empty {
+  padding: 20px 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.result-card {
+  width: 100%;
+  text-align: left;
+  background: var(--sidebar-bg);
+  border: none;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-family: var(--sans);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.result-card:hover {
+  background: #f8fafc;
+}
+
+.result-card--selected {
+  background: #f0f9ff;
+}
+
+.result-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.result-card-rank {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 28px;
+}
+
+.result-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.result-card-street {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.result-card-cross {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.result-card-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.result-card-warning-badge {
+  color: #92400e;
+  font-weight: 600;
+}
+
+/* ── Score bar ───────────────────────────────────── */
+
+.score-bar {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.score-bar-segment {
+  width: 10px;
+  height: 6px;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
 /* ── Rule Card ───────────────────────────────────── */
 
 .rule-card {
@@ -254,10 +426,39 @@ body {
 
 .rule-card-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 14px 16px 10px;
+  flex-direction: column;
+  padding: 12px 16px 10px;
   border-left: 4px solid #ccc;
+  gap: 4px;
+}
+
+.rule-card-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 0;
+  font-family: var(--sans);
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+.rule-card-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .rule-card-street {

@@ -26,12 +26,22 @@ function formatDuration(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
-interface SearchFormProps {
-  onSearch: (request: RecommendationRequest) => void;
-  loading: boolean;
+function formatTimeSummary(isoLocal: string): string {
+  const d = new Date(isoLocal);
+  return d.toLocaleString("en-US", {
+    weekday: "short", month: "short", day: "numeric",
+    hour: "numeric", minute: "2-digit",
+  });
 }
 
-export default function SearchForm({ onSearch, loading }: SearchFormProps) {
+interface SearchFormProps {
+  onSearch: (request: RecommendationRequest, destinationLabel: string) => void;
+  loading: boolean;
+  collapsed: boolean;
+  onExpand: () => void;
+}
+
+export default function SearchForm({ onSearch, loading, collapsed, onExpand }: SearchFormProps) {
   const [destinationIndex, setDestinationIndex] = useState(0);
   const [arrivalTime, setArrivalTime] = useState(toLocalDatetimeValue(new Date()));
   const [durationMinutes, setDurationMinutes] = useState(90);
@@ -39,12 +49,31 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
 
   function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
-    onSearch({
-      destination: DESTINATIONS[destinationIndex].coords,
-      arrival_time: new Date(arrivalTime).toISOString(),
-      duration_minutes: durationMinutes,
-      has_resident_permit: hasPermit,
-    });
+    onSearch(
+      {
+        destination: DESTINATIONS[destinationIndex].coords,
+        arrival_time: new Date(arrivalTime).toISOString(),
+        duration_minutes: durationMinutes,
+        has_resident_permit: hasPermit,
+      },
+      DESTINATIONS[destinationIndex].label
+    );
+  }
+
+  if (collapsed) {
+    return (
+      <div className="search-summary" onClick={onExpand} role="button" tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && onExpand()}>
+        <div className="search-summary-content">
+          <span className="search-summary-dest">📍 {DESTINATIONS[destinationIndex].label}</span>
+          <span className="search-summary-details">
+            {formatTimeSummary(arrivalTime)} · {formatDuration(durationMinutes)}
+            {hasPermit ? " · Permit" : ""}
+          </span>
+        </div>
+        <span className="search-summary-edit">Edit ✎</span>
+      </div>
+    );
   }
 
   return (

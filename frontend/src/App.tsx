@@ -2,15 +2,20 @@ import { useState } from "react";
 import SearchForm from "./components/SearchForm";
 import Map from "./components/Map";
 import RuleCard from "./components/RuleCard";
+import ResultsList from "./components/ResultsList";
 import { useParking } from "./hooks/useParking";
-import type { RecommendationRequest } from "./types/parking";
+import type { RecommendationRequest, LatLng } from "./types/parking";
 
 export default function App() {
   const { results, loading, error, search } = useParking();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [formCollapsed, setFormCollapsed] = useState(false);
+  const [destination, setDestination] = useState<LatLng | null>(null);
 
   function handleSearch(request: RecommendationRequest) {
     setSelectedId(null);
+    setFormCollapsed(true);
+    setDestination(request.destination);
     search(request);
   }
 
@@ -18,19 +23,27 @@ export default function App() {
     setSelectedId(id);
   }
 
-  function handleCloseCard() {
+  function handleBack() {
     setSelectedId(null);
   }
 
+  function handleClose() {
+    setSelectedId(null);
+    setFormCollapsed(false);
+  }
+
   const selectedResult = results?.results.find((r) => r.segment_id === selectedId) ?? null;
-  const selectedRank = selectedResult
-    ? results!.results.indexOf(selectedResult)
-    : 0;
+  const selectedRank = selectedResult ? results!.results.indexOf(selectedResult) : 0;
 
   return (
     <div className="app-layout">
       <aside className="sidebar">
-        <SearchForm onSearch={handleSearch} loading={loading} />
+        <SearchForm
+          onSearch={handleSearch}
+          loading={loading}
+          collapsed={formCollapsed}
+          onExpand={() => setFormCollapsed(false)}
+        />
 
         {error && (
           <div className="error-banner">
@@ -38,35 +51,31 @@ export default function App() {
           </div>
         )}
 
-        {selectedResult ? (
+        {loading && (
+          <div className="sidebar-loading">Searching Fenway…</div>
+        )}
+
+        {!loading && selectedResult ? (
           <RuleCard
             result={selectedResult}
             rank={selectedRank}
-            onClose={handleCloseCard}
+            onBack={handleBack}
+            onClose={handleClose}
           />
-        ) : results ? (
-          <div className="results-hint">
-            {results.results.length > 0 ? (
-              <>
-                <p>
-                  <strong>{results.results.length}</strong> legal option
-                  {results.results.length !== 1 ? "s" : ""} found in{" "}
-                  <strong>{results.neighborhood}</strong>.
-                </p>
-                <p className="muted">Click a segment on the map for details.</p>
-              </>
-            ) : (
-              <p className="muted">{results.message}</p>
-            )}
-          </div>
+        ) : !loading && results ? (
+          <ResultsList
+            results={results.results}
+            selectedId={selectedId}
+            onSelect={handleSegmentSelect}
+          />
         ) : null}
       </aside>
 
       <main className="map-container">
-        {loading && <div className="loading-overlay">Searching…</div>}
         <Map
           results={results?.results ?? []}
           selectedId={selectedId}
+          destination={destination}
           onSegmentSelect={handleSegmentSelect}
         />
       </main>

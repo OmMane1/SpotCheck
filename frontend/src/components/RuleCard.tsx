@@ -3,27 +3,32 @@ import { scoreToColor, scoreToLabel, rankLabel } from "../utils/colors";
 
 interface RuleCardProps {
   result: RecommendationResult;
-  rank: number; // 0-indexed position in results array
+  rank: number;
   onClose: () => void;
+  onBack: () => void;
 }
 
-export default function RuleCard({ result, rank, onClose }: RuleCardProps) {
+export default function RuleCard({ result, rank, onClose, onBack }: RuleCardProps) {
   const color = scoreToColor(result.score);
   const label = scoreToLabel(result.score);
 
   return (
     <div className="rule-card">
       <div className="rule-card-header" style={{ borderLeftColor: color }}>
-        <div>
-          <h2 className="rule-card-street">{result.street_name}</h2>
-          <p className="rule-card-cross-streets">
-            {result.from_street} → {result.to_street}
-          </p>
+        <div className="rule-card-header-top">
+          <button className="back-btn" onClick={onBack}>← Back</button>
+          <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <h2 className="rule-card-street">{result.street_name}</h2>
+        <p className="rule-card-cross-streets">
+          {result.from_street} → {result.to_street}
+        </p>
+        <div className="rule-card-badge-row">
+          <ScoreBar score={result.score} color={color} />
           <span className="rule-card-badge" style={{ backgroundColor: color }}>
             {rankLabel(rank)} · {label}
           </span>
         </div>
-        <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
       </div>
 
       <div className="rule-card-section">
@@ -56,6 +61,21 @@ export default function RuleCard({ result, rank, onClose }: RuleCardProps) {
           </ul>
         </div>
       )}
+    </div>
+  );
+}
+
+function ScoreBar({ score, color }: { score: number; color: string }) {
+  const filled = score <= 0.35 ? 3 : score <= 0.60 ? 2 : 1;
+  return (
+    <div className="score-bar">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="score-bar-segment"
+          style={{ background: i <= filled ? color : "#e2e8f0" }}
+        />
+      ))}
     </div>
   );
 }
