@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -24,6 +24,8 @@ class NoParkingWindow(BaseModel):
     start: str
     end: str
     reason: str
+    seasonal_start_date: date | None = None
+    seasonal_end_date: date | None = None
 
 
 class SpecialRule(BaseModel):
@@ -66,6 +68,7 @@ class ParkingSegment(BaseModel):
     nearby_demand: NearbyDemand
     source_notes: list[SourceNote] = Field(default_factory=list)
     last_verified_at: datetime | None = None
+    data_confidence: Literal["curated", "mixed", "live_verified"] = "curated"
 
 
 class SegmentCollection(BaseModel):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from app.models.parking import (
     NoParkingWindow,
@@ -125,6 +125,8 @@ def _find_blocking_window(
     for window in windows:
         if weekday not in window.days:
             continue
+        if not _is_window_in_season(window, arrival.date()):
+            continue
         if arrival_time < window.end and departure_time > window.start:
             return window
     return None
@@ -136,6 +138,8 @@ def _upcoming_restriction_warning(segment: ParkingSegment, departure: datetime) 
     for window in segment.rules.no_parking_windows:
         if weekday not in window.days:
             continue
+        if not _is_window_in_season(window, departure.date()):
+            continue
         restriction_time = _combine_date_and_time(departure, window.start)
         delta_minutes = int((restriction_time - departure).total_seconds() / 60)
         if 0 <= delta_minutes <= WARNING_WINDOW_MINUTES and departure_time <= window.start:
@@ -146,6 +150,14 @@ def _upcoming_restriction_warning(segment: ParkingSegment, departure: datetime) 
 def _combine_date_and_time(day: datetime, clock_time: str) -> datetime:
     hour, minute = [int(part) for part in clock_time.split(":")]
     return day.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+
+def _is_window_in_season(window: NoParkingWindow, current_date: date) -> bool:
+    if window.seasonal_start_date and current_date < window.seasonal_start_date:
+        return False
+    if window.seasonal_end_date and current_date > window.seasonal_end_date:
+        return False
+    return True
 
 
 def _calculate_risk_score(segment: ParkingSegment, warnings: list[str]) -> float:

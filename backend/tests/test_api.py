@@ -11,6 +11,7 @@ def test_health_endpoint() -> None:
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+    assert "data_refresh" in response.json()
 
 
 def test_recommendations_endpoint_returns_valid_payload() -> None:
