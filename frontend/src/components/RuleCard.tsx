@@ -8,7 +8,12 @@ interface RuleCardProps {
   onBack: () => void;
 }
 
-export default function RuleCard({ result, rank, onClose, onBack }: RuleCardProps) {
+export default function RuleCard({
+  result,
+  rank,
+  onClose,
+  onBack,
+}: RuleCardProps) {
   const color = scoreToColor(result.score);
   const label = scoreToLabel(result.score);
 
@@ -16,17 +21,21 @@ export default function RuleCard({ result, rank, onClose, onBack }: RuleCardProp
     <div className="rule-card">
       <div className="rule-card-header" style={{ borderLeftColor: color }}>
         <div className="rule-card-header-top">
-          <button className="back-btn" onClick={onBack}>← Back</button>
-          <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
+          <button className="back-btn" onClick={onBack}>
+            Back
+          </button>
+          <button className="close-btn" onClick={onClose} aria-label="Close">
+            X
+          </button>
         </div>
         <h2 className="rule-card-street">{result.street_name}</h2>
         <p className="rule-card-cross-streets">
-          {result.from_street} → {result.to_street}
+          {result.from_street} - {result.to_street}
         </p>
         <div className="rule-card-badge-row">
           <ScoreBar score={result.score} color={color} />
           <span className="rule-card-badge" style={{ backgroundColor: color }}>
-            {rankLabel(rank)} · {label}
+            {rankLabel(rank)} - {label}
           </span>
         </div>
       </div>
@@ -66,7 +75,7 @@ export default function RuleCard({ result, rank, onClose, onBack }: RuleCardProp
 }
 
 function ScoreBar({ score, color }: { score: number; color: string }) {
-  const filled = score <= 0.35 ? 3 : score <= 0.60 ? 2 : 1;
+  const filled = score <= 0.35 ? 3 : score <= 0.6 ? 2 : 1;
   return (
     <div className="score-bar">
       {[1, 2, 3].map((i) => (
@@ -91,7 +100,7 @@ function formatDuration(minutes: number): string {
 function RuleBullets({ result }: { result: RecommendationResult }) {
   const isMetered = result.pricing !== "Free";
   const bullets = [
-    isMetered ? `Metered · ${result.pricing}` : "Free parking",
+    isMetered ? `Metered - ${result.pricing}` : "Free parking",
     `Max stay: ${formatDuration(result.max_duration_minutes)}`,
     result.permit_required ? "Resident permit required" : "No permit required",
   ];

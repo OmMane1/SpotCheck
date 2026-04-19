@@ -48,7 +48,11 @@ function formatDuration(minutes: number): string {
   return `${h}h ${m}m (${minutes} min)`;
 }
 
-export default function SegmentLayer({ results, selectedId, onSelect }: SegmentLayerProps) {
+export default function SegmentLayer({
+  results,
+  selectedId,
+  onSelect,
+}: SegmentLayerProps) {
   return (
     <>
       {results.map((result, index) => {
@@ -77,13 +81,15 @@ export default function SegmentLayer({ results, selectedId, onSelect }: SegmentL
                   </span>
                 </div>
                 <p className="pin-popup-street">{result.street_name}</p>
-                <p className="pin-popup-cross">{result.from_street} → {result.to_street}</p>
+                <p className="pin-popup-cross">
+                  {result.from_street} - {result.to_street}
+                </p>
                 <div className="pin-popup-meta">
-                  <span>🚶 ~{result.walk_minutes} min</span>
-                  <span>💰 {result.pricing}</span>
-                  <span>⏱ {formatDuration(result.max_duration_minutes)}</span>
+                  <span>Walk ~{result.walk_minutes} min</span>
+                  <span>Cost {result.pricing}</span>
+                  <span>Limit {formatDuration(result.max_duration_minutes)}</span>
                 </div>
-                <p className="pin-popup-hint">← See full details in the sidebar</p>
+                <p className="pin-popup-hint">See full details in the sidebar</p>
               </div>
             </Popup>
           </Marker>

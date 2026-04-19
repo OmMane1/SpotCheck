@@ -29,8 +29,11 @@ function formatDuration(minutes: number): string {
 function formatTimeSummary(isoLocal: string): string {
   const d = new Date(isoLocal);
   return d.toLocaleString("en-US", {
-    weekday: "short", month: "short", day: "numeric",
-    hour: "numeric", minute: "2-digit",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
@@ -41,7 +44,12 @@ interface SearchFormProps {
   onExpand: () => void;
 }
 
-export default function SearchForm({ onSearch, loading, collapsed, onExpand }: SearchFormProps) {
+export default function SearchForm({
+  onSearch,
+  loading,
+  collapsed,
+  onExpand,
+}: SearchFormProps) {
   const [destinationIndex, setDestinationIndex] = useState(0);
   const [arrivalTime, setArrivalTime] = useState(toLocalDatetimeValue(new Date()));
   const [durationMinutes, setDurationMinutes] = useState(90);
@@ -62,16 +70,23 @@ export default function SearchForm({ onSearch, loading, collapsed, onExpand }: S
 
   if (collapsed) {
     return (
-      <div className="search-summary" onClick={onExpand} role="button" tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && onExpand()}>
+      <div
+        className="search-summary"
+        onClick={onExpand}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && onExpand()}
+      >
         <div className="search-summary-content">
-          <span className="search-summary-dest">📍 {DESTINATIONS[destinationIndex].label}</span>
+          <span className="search-summary-dest">
+            Destination: {DESTINATIONS[destinationIndex].label}
+          </span>
           <span className="search-summary-details">
-            {formatTimeSummary(arrivalTime)} · {formatDuration(durationMinutes)}
-            {hasPermit ? " · Permit" : ""}
+            {formatTimeSummary(arrivalTime)} - {formatDuration(durationMinutes)}
+            {hasPermit ? " - Permit" : ""}
           </span>
         </div>
-        <span className="search-summary-edit">Edit ✎</span>
+        <span className="search-summary-edit">Edit</span>
       </div>
     );
   }
@@ -79,7 +94,7 @@ export default function SearchForm({ onSearch, loading, collapsed, onExpand }: S
   return (
     <form onSubmit={handleSubmit} className="search-form">
       <h1 className="app-title">SpotCheck</h1>
-      <p className="app-subtitle">Find legal parking in Fenway — avoid the ticket.</p>
+      <p className="app-subtitle">Find legal parking in Fenway - avoid the ticket.</p>
 
       <label className="field-label">
         Destination
@@ -89,7 +104,9 @@ export default function SearchForm({ onSearch, loading, collapsed, onExpand }: S
           className="field-input"
         >
           {DESTINATIONS.map((d, i) => (
-            <option key={d.label} value={i}>{d.label}</option>
+            <option key={d.label} value={i}>
+              {d.label}
+            </option>
           ))}
         </select>
       </label>
@@ -128,7 +145,7 @@ export default function SearchForm({ onSearch, loading, collapsed, onExpand }: S
       </label>
 
       <button type="submit" className="search-btn" disabled={loading}>
-        {loading ? "Searching…" : "Find Parking"}
+        {loading ? "Searching..." : "Find Parking"}
       </button>
     </form>
   );

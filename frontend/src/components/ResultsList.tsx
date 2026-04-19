@@ -8,7 +8,12 @@ interface ResultsListProps {
   onSelect: (id: string) => void;
 }
 
-export default function ResultsList({ results, rejectionReasons, selectedId, onSelect }: ResultsListProps) {
+export default function ResultsList({
+  results,
+  rejectionReasons,
+  selectedId,
+  onSelect,
+}: ResultsListProps) {
   if (results.length === 0) {
     return (
       <div className="results-empty">
@@ -21,7 +26,9 @@ export default function ResultsList({ results, rejectionReasons, selectedId, onS
             ))}
           </ul>
         )}
-        <p className="muted results-empty-hint">Try adjusting your arrival time or shortening your duration.</p>
+        <p className="muted results-empty-hint">
+          Try adjusting your arrival time or shortening your duration.
+        </p>
       </div>
     );
   }
@@ -30,7 +37,7 @@ export default function ResultsList({ results, rejectionReasons, selectedId, onS
     <div className="results-list">
       <p className="results-list-header">
         {results.length} legal spot{results.length !== 1 ? "s" : ""} found
-        <span className="muted"> · click to see details</span>
+        <span className="muted"> - click to see details</span>
       </p>
       {results.map((result, index) => (
         <ResultCard
@@ -73,13 +80,17 @@ function ResultCard({ result, rank, isSelected, onClick }: ResultCardProps) {
       </div>
 
       <div className="result-card-street">{result.street_name}</div>
-      <div className="result-card-cross">{result.from_street} → {result.to_street}</div>
+      <div className="result-card-cross">
+        {result.from_street} - {result.to_street}
+      </div>
 
       <div className="result-card-meta">
-        <span>🚶 {result.walk_minutes} min</span>
-        <span>💰 {result.pricing}</span>
+        <span>Walk {result.walk_minutes} min</span>
+        <span>Cost {result.pricing}</span>
         {result.risk_warnings.length > 0 && (
-          <span className="result-card-warning-badge">⚠ {result.risk_warnings.length}</span>
+          <span className="result-card-warning-badge">
+            Warning {result.risk_warnings.length}
+          </span>
         )}
       </div>
     </button>
@@ -87,8 +98,7 @@ function ResultCard({ result, rank, isSelected, onClick }: ResultCardProps) {
 }
 
 function ScoreBar({ score, color }: { score: number; color: string }) {
-  // lower score = better, so filled bars = inverted
-  const filled = score <= 0.35 ? 3 : score <= 0.60 ? 2 : 1;
+  const filled = score <= 0.35 ? 3 : score <= 0.6 ? 2 : 1;
   return (
     <div className="score-bar">
       {[1, 2, 3].map((i) => (

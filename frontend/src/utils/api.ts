@@ -1,7 +1,10 @@
 import type { RecommendationRequest, RecommendationsResponse } from "../types/parking";
 
-// Empty string = same origin (correct for Vercel). Set VITE_API_BASE_URL=http://localhost:8000 in .env for local dev.
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+// In local Vite dev, default to the backend on port 8000.
+// In production/serverless, keep same-origin unless explicitly overridden.
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

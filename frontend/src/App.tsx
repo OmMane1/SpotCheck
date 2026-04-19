@@ -7,7 +7,10 @@ import ParkingFilterBar, { type ParkingFilter } from "./components/ParkingFilter
 import { useParking } from "./hooks/useParking";
 import type { RecommendationRequest, LatLng, RecommendationResult } from "./types/parking";
 
-function applyFilter(results: RecommendationResult[], filter: ParkingFilter): RecommendationResult[] {
+function applyFilter(
+  results: RecommendationResult[],
+  filter: ParkingFilter
+): RecommendationResult[] {
   if (filter === "free") return results.filter((r) => r.pricing === "Free");
   if (filter === "paid") return results.filter((r) => r.pricing !== "Free");
   return results;
@@ -43,7 +46,8 @@ export default function App() {
 
   const allResults = results?.results ?? [];
   const filteredResults = applyFilter(allResults, parkingFilter);
-  const selectedResult = filteredResults.find((r) => r.segment_id === selectedId) ?? null;
+  const selectedResult =
+    filteredResults.find((r) => r.segment_id === selectedId) ?? null;
   const selectedRank = selectedResult ? filteredResults.indexOf(selectedResult) : 0;
 
   return (
@@ -62,9 +66,7 @@ export default function App() {
           </div>
         )}
 
-        {loading && (
-          <div className="sidebar-loading">Searching Fenway…</div>
-        )}
+        {loading && <div className="sidebar-loading">Searching Fenway...</div>}
 
         {!loading && results && (
           <ParkingFilterBar value={parkingFilter} onChange={handleFilterChange} />

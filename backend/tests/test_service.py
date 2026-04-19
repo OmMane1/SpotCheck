@@ -45,7 +45,7 @@ def test_duration_limit_filters_out_segments() -> None:
     response = service.get_recommendations(build_request(duration_minutes=180))
 
     assert response.results == []
-    assert "No legal parking options" in response.message
+    assert "No legal parking found" in response.message
 
 
 def test_permit_only_segments_are_filtered_for_non_permit_users() -> None:
