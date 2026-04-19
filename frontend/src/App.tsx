@@ -20,6 +20,7 @@ export default function App() {
   const [destination, setDestination] = useState<LatLng | null>(null);
   const [parkingFilter, setParkingFilter] = useState<ParkingFilter>("any");
   const [arrivalTime, setArrivalTime] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
 
   function handleSearch(request: RecommendationRequest) {
     setSelectedId(null);
@@ -97,6 +98,8 @@ export default function App() {
           selectedId={selectedId}
           selectedResult={selectedResult}
           destination={destination}
+          userLocation={userLocation}
+          onLocate={setUserLocation}
           onSegmentSelect={setSelectedId}
         />
       </main>

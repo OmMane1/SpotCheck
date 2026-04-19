@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import SegmentLayer from "./SegmentLayer";
+import DrivingRoute from "./DrivingRoute";
 import type { RecommendationResult, LatLng } from "../types/parking";
 
 const FENWAY_CENTER: [number, number] = [42.3467, -71.0972];
@@ -27,11 +28,20 @@ const destinationIcon = L.divIcon({
   iconAnchor: [8, 8],
 });
 
+const userLocationIcon = L.divIcon({
+  className: "",
+  html: `<div class="user-dot-outer"><div class="user-dot-inner"></div></div>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+});
+
 interface MapProps {
   results: RecommendationResult[];
   selectedId: string | null;
   selectedResult: RecommendationResult | null;
   destination: LatLng | null;
+  userLocation: LatLng | null;
+  onLocate: (loc: LatLng) => void;
   onSegmentSelect: (id: string) => void;
 }
 
@@ -43,7 +53,6 @@ function MapRecenter({ destination }: { destination: LatLng | null }) {
   return null;
 }
 
-// Flies to a selected pin whenever selectedResult changes
 function MapFlyTo({ result }: { result: RecommendationResult | null }) {
   const map = useMap();
   useEffect(() => {
@@ -54,7 +63,35 @@ function MapFlyTo({ result }: { result: RecommendationResult | null }) {
   return null;
 }
 
-export default function Map({ results, selectedId, selectedResult, destination, onSegmentSelect }: MapProps) {
+export default function Map({
+  results,
+  selectedId,
+  selectedResult,
+  destination,
+  userLocation,
+  onLocate,
+  onSegmentSelect,
+}: MapProps) {
+  const [locating, setLocating] = useState(false);
+  const [locateError, setLocateError] = useState(false);
+
+  function handleLocate() {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    setLocateError(false);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        onLocate({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      },
+      () => {
+        setLocating(false);
+        setLocateError(true);
+      },
+      { timeout: 10000 }
+    );
+  }
+
   return (
     <div className="map-wrapper">
       <MapContainer
@@ -79,6 +116,14 @@ export default function Map({ results, selectedId, selectedResult, destination, 
           <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} />
         )}
 
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={userLocationIcon} />
+        )}
+
+        {userLocation && selectedResult?.center && (
+          <DrivingRoute from={userLocation} to={selectedResult.center} />
+        )}
+
         <SegmentLayer
           results={results}
           selectedId={selectedId}
@@ -86,12 +131,21 @@ export default function Map({ results, selectedId, selectedResult, destination, 
         />
       </MapContainer>
 
-      <Legend />
+      <button
+        className={`locate-btn ${locating ? "locate-btn--loading" : ""} ${locateError ? "locate-btn--error" : ""}`}
+        onClick={handleLocate}
+        disabled={locating}
+        title="Show driving route from your location"
+      >
+        {locating ? "Locating…" : locateError ? "Location denied" : "📍 Navigate to spot"}
+      </button>
+
+      <Legend showRoute={!!userLocation && !!selectedResult} />
     </div>
   );
 }
 
-function Legend() {
+function Legend({ showRoute }: { showRoute: boolean }) {
   const items = [
     { color: "#22c55e", label: "Best Match" },
     { color: "#f59e0b", label: "Good Option" },
@@ -118,6 +172,16 @@ function Legend() {
         }} />
         <span>Your destination</span>
       </div>
+      {showRoute && (
+        <div className="legend-item">
+          <div style={{
+            width: 20, height: 4, background: "#2563eb",
+            borderRadius: 2, flexShrink: 0,
+            backgroundImage: "repeating-linear-gradient(90deg, #2563eb 0 8px, transparent 8px 14px)",
+          }} />
+          <span>Driving route</span>
+        </div>
+      )}
     </div>
   );
 }
