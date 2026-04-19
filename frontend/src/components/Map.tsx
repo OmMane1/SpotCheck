@@ -100,17 +100,13 @@ function Legend() {
 
   return (
     <div className="map-legend">
-      {items.map(({ color, label }, index) => (
+      {items.map(({ color, label }) => (
         <div key={label} className="legend-item">
           <div style={{
-            width: 20, height: 20, background: color,
+            width: 14, height: 14, background: color,
             border: "2px solid white", borderRadius: "50%",
             boxShadow: "0 1px 4px rgba(0,0,0,0.3)", flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 9, fontWeight: 800, color: "white",
-          }}>
-            {index + 1}
-          </div>
+          }} />
           <span>{label}</span>
         </div>
       ))}
