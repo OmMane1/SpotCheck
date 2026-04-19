@@ -56,6 +56,8 @@ class ParkingRecommendationService:
                     risk_warnings=evaluation.risk_warnings,
                     rule_summary=evaluation.rule_summary,
                     pricing=evaluation.pricing,
+                    center=segment.center,
+                    polyline=segment.polyline,
                 )
             )
 
