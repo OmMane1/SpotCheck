@@ -317,6 +317,28 @@ body {
   color: var(--danger);
 }
 
+.rule-card-cross-streets {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+}
+
+.rule-card-rule-summary {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.rule-card-good {
+  background: #f0fdf4;
+}
+
+.rule-card-good ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #15803d;
+}
+
 .rule-card-warning {
   background: var(--warning-bg);
   border-left: 3px solid #ca8a04;

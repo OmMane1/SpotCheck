@@ -1,79 +1,56 @@
-import type { SegmentResult, SegmentDetail } from "../types/parking";
-import { scoreToColor, scoreToLabel } from "../utils/colors";
+import type { RecommendationResult } from "../types/parking";
+import { scoreToColor, scoreToLabel, rankLabel } from "../utils/colors";
 
 interface RuleCardProps {
-  segment: SegmentResult;
-  detail: SegmentDetail | null;
-  detailLoading: boolean;
+  result: RecommendationResult;
+  rank: number; // 0-indexed position in results array
   onClose: () => void;
 }
 
-export default function RuleCard({ segment, detail, detailLoading, onClose }: RuleCardProps) {
-  const color = scoreToColor(segment.availability_score, segment.is_legal);
-  const label = scoreToLabel(segment.availability_score, segment.is_legal);
+export default function RuleCard({ result, rank, onClose }: RuleCardProps) {
+  const color = scoreToColor(result.score);
+  const label = scoreToLabel(result.score);
 
   return (
     <div className="rule-card">
       <div className="rule-card-header" style={{ borderLeftColor: color }}>
         <div>
-          <h2 className="rule-card-street">{segment.street_name}</h2>
+          <h2 className="rule-card-street">{result.street_name}</h2>
+          <p className="rule-card-cross-streets">
+            {result.from_street} → {result.to_street}
+          </p>
           <span className="rule-card-badge" style={{ backgroundColor: color }}>
-            {label}
+            {rankLabel(rank)} · {label}
           </span>
         </div>
         <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
       </div>
 
-      {!segment.is_legal && segment.legality_reasons.length > 0 && (
-        <div className="rule-card-section rule-card-illegal">
-          <h3>Why it's illegal right now</h3>
-          <ul>
-            {segment.legality_reasons.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {segment.is_legal && (
-        <div className="rule-card-section">
-          <div className="rule-card-meta">
-            <MetaItem label="Walk" value={formatDistance(segment.distance_meters)} />
-            {segment.meter_rate !== null && (
-              <MetaItem label="Rate" value={`$${segment.meter_rate.toFixed(2)}/hr`} />
-            )}
-            {segment.max_duration_hours !== null && (
-              <MetaItem label="Max stay" value={`${segment.max_duration_hours}h`} />
-            )}
-          </div>
-          <p className="rule-card-recommendation">{segment.recommended_action}</p>
-        </div>
-      )}
-
       <div className="rule-card-section">
-        <h3>Restrictions</h3>
-        {detailLoading ? (
-          <p className="muted">Loading details…</p>
-        ) : detail ? (
-          <ul className="rule-list">
-            {detail.human_readable_rules.map((rule, i) => (
-              <li key={i}>{rule}</li>
-            ))}
-          </ul>
-        ) : (
-          <ul className="rule-list">
-            {segment.restrictions_summary.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
-        )}
+        <div className="rule-card-meta">
+          <MetaItem label="Walk" value={`~${result.walk_minutes} min`} />
+          <MetaItem label="Distance" value={`${Math.round(result.distance_meters)}m`} />
+          <MetaItem label="Cost" value={result.pricing} />
+        </div>
+        <p className="rule-card-rule-summary">{result.rule_summary}</p>
       </div>
 
-      {detail?.warnings && detail.warnings.length > 0 && (
+      {result.why_good.length > 0 && (
+        <div className="rule-card-section rule-card-good">
+          <h3>Why it works</h3>
+          <ul className="rule-list">
+            {result.why_good.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {result.risk_warnings.length > 0 && (
         <div className="rule-card-section rule-card-warning">
-          <h3>Warnings</h3>
-          <ul>
-            {detail.warnings.map((w, i) => (
+          <h3>Watch out</h3>
+          <ul className="rule-list">
+            {result.risk_warnings.map((w, i) => (
               <li key={i}>{w}</li>
             ))}
           </ul>
@@ -90,10 +67,4 @@ function MetaItem({ label, value }: { label: string; value: string }) {
       <span className="meta-value">{value}</span>
     </div>
   );
-}
-
-function formatDistance(meters: number): string {
-  if (meters < 100) return "< 1 min walk";
-  const mins = Math.round(meters / 80); // ~80m/min walking pace
-  return `~${mins} min walk`;
 }

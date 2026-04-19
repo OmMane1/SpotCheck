@@ -1,67 +1,35 @@
 import { useState, useCallback } from "react";
-import { searchParking, getSegmentDetail } from "../utils/api";
-import type { SearchQuery, SearchResponse, SegmentDetail } from "../types/parking";
+import { getRecommendations } from "../utils/api";
+import type { RecommendationRequest, RecommendationsResponse } from "../types/parking";
 
-interface ParkingSearchState {
-  results: SearchResponse | null;
-  loading: boolean;
-  error: string | null;
-}
-
-interface SegmentDetailState {
-  detail: SegmentDetail | null;
+interface ParkingState {
+  results: RecommendationsResponse | null;
   loading: boolean;
   error: string | null;
 }
 
 export function useParking() {
-  const [searchState, setSearchState] = useState<ParkingSearchState>({
+  const [state, setState] = useState<ParkingState>({
     results: null,
     loading: false,
     error: null,
   });
 
-  const [detailState, setDetailState] = useState<SegmentDetailState>({
-    detail: null,
-    loading: false,
-    error: null,
-  });
-
-  const search = useCallback(async (query: SearchQuery) => {
-    setSearchState({ results: null, loading: true, error: null });
+  const search = useCallback(async (request: RecommendationRequest) => {
+    setState({ results: null, loading: true, error: null });
     try {
-      const data = await searchParking(query);
-      setSearchState({ results: data, loading: false, error: null });
+      const data = await getRecommendations(request);
+      setState({ results: data, loading: false, error: null });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Search failed";
-      setSearchState({ results: null, loading: false, error: message });
+      setState({ results: null, loading: false, error: message });
     }
-  }, []);
-
-  const fetchDetail = useCallback(async (segmentId: string) => {
-    setDetailState({ detail: null, loading: true, error: null });
-    try {
-      const data = await getSegmentDetail(segmentId);
-      setDetailState({ detail: data, loading: false, error: null });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load details";
-      setDetailState({ detail: null, loading: false, error: message });
-    }
-  }, []);
-
-  const clearDetail = useCallback(() => {
-    setDetailState({ detail: null, loading: false, error: null });
   }, []);
 
   return {
-    results: searchState.results,
-    searchLoading: searchState.loading,
-    searchError: searchState.error,
-    detail: detailState.detail,
-    detailLoading: detailState.loading,
-    detailError: detailState.error,
+    results: state.results,
+    loading: state.loading,
+    error: state.error,
     search,
-    fetchDetail,
-    clearDetail,
   };
 }

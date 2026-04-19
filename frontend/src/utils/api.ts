@@ -1,4 +1,4 @@
-import type { SearchQuery, SearchResponse, SegmentDetail } from "../types/parking";
+import type { RecommendationRequest, RecommendationsResponse } from "../types/parking";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -16,13 +16,11 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function searchParking(query: SearchQuery): Promise<SearchResponse> {
-  return apiFetch<SearchResponse>("/api/search", {
+export function getRecommendations(
+  request: RecommendationRequest
+): Promise<RecommendationsResponse> {
+  return apiFetch<RecommendationsResponse>("/recommendations", {
     method: "POST",
-    body: JSON.stringify(query),
+    body: JSON.stringify(request),
   });
-}
-
-export function getSegmentDetail(id: string): Promise<SegmentDetail> {
-  return apiFetch<SegmentDetail>(`/api/segment/${id}`);
 }

@@ -1,29 +1,18 @@
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import SegmentLayer from "./SegmentLayer";
-import type { SegmentResult, SearchMeta } from "../types/parking";
+import type { RecommendationResult } from "../types/parking";
 
 const FENWAY_CENTER: [number, number] = [42.3467, -71.0972];
 const DEFAULT_ZOOM = 15;
 
 interface MapProps {
-  segments: SegmentResult[];
-  meta: SearchMeta | null;
+  results: RecommendationResult[];
   selectedId: string | null;
   onSegmentSelect: (id: string) => void;
 }
 
-// Recenter map when search returns a new destination
-function MapController({ meta }: { meta: SearchMeta | null }) {
-  const map = useMap();
-  if (meta) {
-    const [lon, lat] = meta.destination_coords;
-    map.setView([lat, lon], DEFAULT_ZOOM, { animate: true });
-  }
-  return null;
-}
-
-export default function Map({ segments, meta, selectedId, onSegmentSelect }: MapProps) {
+export default function Map({ results, selectedId, onSegmentSelect }: MapProps) {
   return (
     <div className="map-wrapper">
       <MapContainer
@@ -36,44 +25,31 @@ export default function Map({ segments, meta, selectedId, onSegmentSelect }: Map
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        <MapController meta={meta} />
         <SegmentLayer
-          segments={segments}
+          results={results}
           selectedId={selectedId}
           onSelect={onSegmentSelect}
         />
       </MapContainer>
 
       <Legend />
-
-      {meta && (
-        <div className="map-summary">
-          {meta.legal_count} legal of {meta.total_segments} segments
-        </div>
-      )}
     </div>
   );
 }
 
 function Legend() {
   const items = [
-    { color: "#22c55e", label: "Likely Available" },
-    { color: "#f59e0b", label: "Maybe Available" },
-    { color: "#ef4444", label: "Low Confidence" },
-    { color: "#dc2626", label: "Illegal / Restricted", dashed: true },
+    { color: "#22c55e", label: "Best Match (score ≤ 0.35)" },
+    { color: "#f59e0b", label: "Good Option (score ≤ 0.60)" },
+    { color: "#ef4444", label: "Fair Option" },
   ];
 
   return (
     <div className="map-legend">
-      {items.map(({ color, label, dashed }) => (
+      {items.map(({ color, label }) => (
         <div key={label} className="legend-item">
           <svg width="28" height="6">
-            <line
-              x1="0" y1="3" x2="28" y2="3"
-              stroke={color}
-              strokeWidth="4"
-              strokeDasharray={dashed ? "5 3" : undefined}
-            />
+            <line x1="0" y1="3" x2="28" y2="3" stroke={color} strokeWidth="4" />
           </svg>
           <span>{label}</span>
         </div>

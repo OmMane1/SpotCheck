@@ -1,47 +1,67 @@
-import { Polyline, Tooltip } from "react-leaflet";
-import type { SegmentResult } from "../types/parking";
-import { scoreToColor, scoreToLabel, scoreToOpacity } from "../utils/colors";
+import { Polyline, CircleMarker, Tooltip } from "react-leaflet";
+import type { RecommendationResult } from "../types/parking";
+import { scoreToColor, scoreToLabel, scoreToOpacity, rankLabel } from "../utils/colors";
 
 interface SegmentLayerProps {
-  segments: SegmentResult[];
+  results: RecommendationResult[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
-export default function SegmentLayer({ segments, selectedId, onSelect }: SegmentLayerProps) {
+export default function SegmentLayer({ results, selectedId, onSelect }: SegmentLayerProps) {
   return (
     <>
-      {segments.map((seg) => {
-        // GeoJSON is [lon, lat]; Leaflet expects [lat, lon]
-        const positions = seg.geometry.coordinates.map(
-          ([lon, lat]) => [lat, lon] as [number, number]
-        );
+      {results.map((result, index) => {
+        const color = scoreToColor(result.score);
+        const opacity = scoreToOpacity(result.score);
+        const isSelected = result.segment_id === selectedId;
 
-        const color = scoreToColor(seg.availability_score, seg.is_legal);
-        const opacity = scoreToOpacity(seg.availability_score, seg.is_legal);
-        const isSelected = seg.id === selectedId;
+        // Render full polyline if backend provides it, otherwise fall back to a marker
+        if (result.polyline && result.polyline.length >= 2) {
+          const positions = result.polyline.map(
+            ({ lat, lng }) => [lat, lng] as [number, number]
+          );
+          return (
+            <Polyline
+              key={result.segment_id}
+              positions={positions}
+              pathOptions={{ color, opacity, weight: isSelected ? 8 : 5 }}
+              eventHandlers={{ click: () => onSelect(result.segment_id) }}
+            >
+              <SegmentTooltip result={result} rank={index} />
+            </Polyline>
+          );
+        }
 
-        return (
-          <Polyline
-            key={seg.id}
-            positions={positions}
-            pathOptions={{
-              color,
-              opacity,
-              weight: isSelected ? 8 : 5,
-              dashArray: seg.is_legal ? undefined : "6 4",
-            }}
-            eventHandlers={{ click: () => onSelect(seg.id) }}
-          >
-            <Tooltip sticky>
-              <strong>{seg.street_name}</strong>
-              <br />
-              {scoreToLabel(seg.availability_score, seg.is_legal)}
-              {seg.is_legal && ` · Score ${Math.round(seg.availability_score * 100)}%`}
-            </Tooltip>
-          </Polyline>
-        );
+        if (result.center) {
+          return (
+            <CircleMarker
+              key={result.segment_id}
+              center={[result.center.lat, result.center.lng]}
+              radius={isSelected ? 12 : 8}
+              pathOptions={{ color, fillColor: color, fillOpacity: opacity, weight: 2 }}
+              eventHandlers={{ click: () => onSelect(result.segment_id) }}
+            >
+              <SegmentTooltip result={result} rank={index} />
+            </CircleMarker>
+          );
+        }
+
+        // No geometry in response yet — ask backend partner to add center + polyline
+        return null;
       })}
     </>
+  );
+}
+
+function SegmentTooltip({ result, rank }: { result: RecommendationResult; rank: number }) {
+  return (
+    <Tooltip sticky>
+      <strong>{result.street_name}</strong>
+      <br />
+      {rankLabel(rank)} · {scoreToLabel(result.score)}
+      <br />
+      {result.pricing} · ~{result.walk_minutes} min walk
+    </Tooltip>
   );
 }

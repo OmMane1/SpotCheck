@@ -1,22 +1,14 @@
 import { useState } from "react";
-import type { SearchQuery } from "../types/parking";
+import type { RecommendationRequest, PresetDestination } from "../types/parking";
 
-// Preset destinations so we don't depend on a live geocoding API
-const DESTINATIONS = [
-  "Fenway Park",
-  "Kenmore Square",
-  "Lansdowne Street",
-  "Yawkey Way",
-  "Boylston Street (Fenway)",
-  "Park Drive",
+const DESTINATIONS: PresetDestination[] = [
+  { label: "Fenway Park", coords: { lat: 42.3467, lng: -71.0972 } },
+  { label: "Kenmore Square", coords: { lat: 42.3484, lng: -71.0944 } },
+  { label: "Lansdowne Street", coords: { lat: 42.3463, lng: -71.0990 } },
+  { label: "Yawkey Way", coords: { lat: 42.3462, lng: -71.0977 } },
+  { label: "Boylston St & Fenway", coords: { lat: 42.3458, lng: -71.0982 } },
+  { label: "Park Drive", coords: { lat: 42.3440, lng: -71.0944 } },
 ];
-
-const PERMIT_ZONES = ["1A", "1B", "E4", "E5", "E18"];
-
-interface SearchFormProps {
-  onSearch: (query: SearchQuery) => void;
-  loading: boolean;
-}
 
 function toLocalDatetimeValue(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -26,21 +18,32 @@ function toLocalDatetimeValue(date: Date): string {
   );
 }
 
+function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+interface SearchFormProps {
+  onSearch: (request: RecommendationRequest) => void;
+  loading: boolean;
+}
+
 export default function SearchForm({ onSearch, loading }: SearchFormProps) {
-  const [destination, setDestination] = useState(DESTINATIONS[0]);
+  const [destinationIndex, setDestinationIndex] = useState(0);
   const [arrivalTime, setArrivalTime] = useState(toLocalDatetimeValue(new Date()));
-  const [durationHours, setDurationHours] = useState(2);
+  const [durationMinutes, setDurationMinutes] = useState(90);
   const [hasPermit, setHasPermit] = useState(false);
-  const [permitZone, setPermitZone] = useState<string | null>(null);
 
   function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     onSearch({
-      destination,
+      destination: DESTINATIONS[destinationIndex].coords,
       arrival_time: new Date(arrivalTime).toISOString(),
-      duration_hours: durationHours,
-      has_permit: hasPermit,
-      permit_zone: hasPermit ? permitZone : null,
+      duration_minutes: durationMinutes,
+      has_resident_permit: hasPermit,
     });
   }
 
@@ -52,12 +55,12 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
       <label className="field-label">
         Destination
         <select
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
+          value={destinationIndex}
+          onChange={(e) => setDestinationIndex(Number(e.target.value))}
           className="field-input"
         >
-          {DESTINATIONS.map((d) => (
-            <option key={d} value={d}>{d}</option>
+          {DESTINATIONS.map((d, i) => (
+            <option key={d.label} value={i}>{d.label}</option>
           ))}
         </select>
       </label>
@@ -74,14 +77,14 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
       </label>
 
       <label className="field-label">
-        Duration: <strong>{durationHours}h</strong>
+        Duration: <strong>{formatDuration(durationMinutes)}</strong>
         <input
           type="range"
-          min={0.5}
-          max={8}
-          step={0.5}
-          value={durationHours}
-          onChange={(e) => setDurationHours(Number(e.target.value))}
+          min={15}
+          max={240}
+          step={15}
+          value={durationMinutes}
+          onChange={(e) => setDurationMinutes(Number(e.target.value))}
           className="field-range"
         />
       </label>
@@ -94,22 +97,6 @@ export default function SearchForm({ onSearch, loading }: SearchFormProps) {
         />
         I have a resident permit
       </label>
-
-      {hasPermit && (
-        <label className="field-label">
-          Permit Zone
-          <select
-            value={permitZone ?? ""}
-            onChange={(e) => setPermitZone(e.target.value || null)}
-            className="field-input"
-          >
-            <option value="">Select zone…</option>
-            {PERMIT_ZONES.map((z) => (
-              <option key={z} value={z}>{z}</option>
-            ))}
-          </select>
-        </label>
-      )}
 
       <button type="submit" className="search-btn" disabled={loading}>
         {loading ? "Searching…" : "Find Parking"}

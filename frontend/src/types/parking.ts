@@ -1,79 +1,44 @@
-export type RestrictionType = "no_parking" | "meter" | "permit_only" | "time_limit";
-
-export type NeighborhoodName = "Fenway";
-
-export interface TimeRestriction {
-  days: string[];
-  start_time: string;
-  end_time: string;
-  restriction_type: RestrictionType;
-  permit_zone: string | null;
-  rate_per_hour: number | null;
-  max_duration_hours: number | null;
+export interface LatLng {
+  lat: number;
+  lng: number;
 }
 
-export interface StreetCleaning {
-  days: string[];
-  start_time: string;
-  end_time: string;
-  side: "north" | "south" | "both";
-}
-
-export interface GeoLine {
-  type: "LineString";
-  coordinates: [number, number][]; // [lon, lat]
-}
-
-export interface ScoreBreakdown {
-  distance_penalty: number;
-  safety_margin_penalty: number;
-  cost_penalty: number;
-  pressure_penalty: number;
-}
-
-export interface SegmentResult {
-  id: string;
-  street_name: string;
-  neighborhood: NeighborhoodName;
-  geometry: GeoLine;
-  is_legal: boolean;
-  legality_reasons: string[];
-  availability_score: number; // 0.0–1.0
-  score_breakdown: ScoreBreakdown;
-  distance_meters: number;
-  meter_rate: number | null;
-  max_duration_hours: number | null;
-  recommended_action: string;
-  restrictions_summary: string[];
-}
-
-export interface SearchQuery {
-  destination: string;
+export interface RecommendationRequest {
+  destination: LatLng;
   arrival_time: string; // ISO 8601
-  duration_hours: number;
-  has_permit: boolean;
-  permit_zone: string | null;
+  duration_minutes: number; // 1–240
+  has_resident_permit: boolean;
 }
 
-export interface SearchMeta {
-  total_segments: number;
-  legal_count: number;
-  searched_at: string;
-  destination_coords: [number, number]; // [lon, lat]
-}
-
-export interface SearchResponse {
-  segments: SegmentResult[];
-  meta: SearchMeta;
-}
-
-export interface SegmentDetail {
-  id: string;
+// Backend returns only legal results — no is_legal field needed
+// score: lower is better (0 = closest + safest, ~1 = far + risky)
+export interface RecommendationResult {
+  segment_id: string;
   street_name: string;
-  neighborhood: NeighborhoodName;
-  geometry: GeoLine;
-  restrictions: TimeRestriction[];
-  street_cleaning: StreetCleaning | null;
-  warnings: string[];
-  human_readable_rules: string[];
+  from_street: string;
+  to_street: string;
+  distance_meters: number;
+  walk_minutes: number;
+  score: number;
+  why_good: string[];
+  risk_warnings: string[];
+  rule_summary: string;
+  pricing: string;
+  // TODO: ask backend partner to add these fields to RecommendationResult
+  // so segments can be drawn on the map (1-line change in models.py + service.py)
+  center?: LatLng;
+  polyline?: LatLng[];
+}
+
+export interface RecommendationsResponse {
+  neighborhood: string;
+  evaluated_at: string;
+  results: RecommendationResult[]; // sorted ascending by score (index 0 = best)
+  message: string;
+}
+
+// Preset destinations for SearchForm (avoids live geocoding dependency)
+export interface PresetDestination {
+  label: string;
+  coords: LatLng;
 }

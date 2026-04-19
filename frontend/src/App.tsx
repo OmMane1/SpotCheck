@@ -3,76 +3,69 @@ import SearchForm from "./components/SearchForm";
 import Map from "./components/Map";
 import RuleCard from "./components/RuleCard";
 import { useParking } from "./hooks/useParking";
-import type { SearchQuery } from "./types/parking";
+import type { RecommendationRequest } from "./types/parking";
 
 export default function App() {
-  const {
-    results,
-    searchLoading,
-    searchError,
-    detail,
-    detailLoading,
-    search,
-    fetchDetail,
-    clearDetail,
-  } = useParking();
-
+  const { results, loading, error, search } = useParking();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  function handleSearch(query: SearchQuery) {
+  function handleSearch(request: RecommendationRequest) {
     setSelectedId(null);
-    clearDetail();
-    search(query);
+    search(request);
   }
 
   function handleSegmentSelect(id: string) {
     setSelectedId(id);
-    fetchDetail(id);
   }
 
   function handleCloseCard() {
     setSelectedId(null);
-    clearDetail();
   }
 
-  const selectedSegment = results?.segments.find((s) => s.id === selectedId) ?? null;
+  const selectedResult = results?.results.find((r) => r.segment_id === selectedId) ?? null;
+  const selectedRank = selectedResult
+    ? results!.results.indexOf(selectedResult)
+    : 0;
 
   return (
     <div className="app-layout">
       <aside className="sidebar">
-        <SearchForm onSearch={handleSearch} loading={searchLoading} />
+        <SearchForm onSearch={handleSearch} loading={loading} />
 
-        {searchError && (
+        {error && (
           <div className="error-banner">
-            Could not reach the server. Check the backend is running.
+            Could not reach the server. Is the backend running on port 8000?
           </div>
         )}
 
-        {selectedSegment && (
+        {selectedResult ? (
           <RuleCard
-            segment={selectedSegment}
-            detail={detail}
-            detailLoading={detailLoading}
+            result={selectedResult}
+            rank={selectedRank}
             onClose={handleCloseCard}
           />
-        )}
-
-        {!selectedSegment && results && (
+        ) : results ? (
           <div className="results-hint">
-            <p>
-              Found <strong>{results.meta.legal_count}</strong> legal spots out of{" "}
-              <strong>{results.meta.total_segments}</strong> segments.
-            </p>
-            <p className="muted">Click any segment on the map for details.</p>
+            {results.results.length > 0 ? (
+              <>
+                <p>
+                  <strong>{results.results.length}</strong> legal option
+                  {results.results.length !== 1 ? "s" : ""} found in{" "}
+                  <strong>{results.neighborhood}</strong>.
+                </p>
+                <p className="muted">Click a segment on the map for details.</p>
+              </>
+            ) : (
+              <p className="muted">{results.message}</p>
+            )}
           </div>
-        )}
+        ) : null}
       </aside>
 
       <main className="map-container">
-        {searchLoading && <div className="loading-overlay">Searching…</div>}
+        {loading && <div className="loading-overlay">Searching…</div>}
         <Map
-          segments={results?.segments ?? []}
-          meta={results?.meta ?? null}
+          results={results?.results ?? []}
           selectedId={selectedId}
           onSegmentSelect={handleSegmentSelect}
         />
