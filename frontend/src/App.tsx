@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchForm from "./components/SearchForm";
 import Map from "./components/Map";
 import RuleCard from "./components/RuleCard";
 import ResultsList from "./components/ResultsList";
 import ParkingFilterBar, { type ParkingFilter } from "./components/ParkingFilter";
 import { useParking } from "./hooks/useParking";
-import type { RecommendationRequest, LatLng, RecommendationResult } from "./types/parking";
+import { getHealth } from "./utils/api";
+import type {
+  HealthResponse,
+  RecommendationRequest,
+  LatLng,
+  RecommendationResult,
+} from "./types/parking";
 
 function applyFilter(
   results: RecommendationResult[],
@@ -22,6 +28,13 @@ export default function App() {
   const [formCollapsed, setFormCollapsed] = useState(false);
   const [destination, setDestination] = useState<LatLng | null>(null);
   const [parkingFilter, setParkingFilter] = useState<ParkingFilter>("any");
+  const [health, setHealth] = useState<HealthResponse | null>(null);
+
+  useEffect(() => {
+    getHealth()
+      .then(setHealth)
+      .catch(() => setHealth(null));
+  }, []);
   const [arrivalTime, setArrivalTime] = useState<string | null>(null);
 
   function handleSearch(request: RecommendationRequest) {
@@ -65,6 +78,16 @@ export default function App() {
         {error && (
           <div className="error-banner">
             Could not reach the server. Is the backend running on port 8000?
+          </div>
+        )}
+
+        {!error && health && (
+          <div className="sidebar-loading">
+            {health.data_refresh.used_fallback
+              ? "Using local Fenway dataset fallback."
+              : "Live Boston data refresh is active."}
+            {" "}
+            Google Places is not connected in this MVP.
           </div>
         )}
 

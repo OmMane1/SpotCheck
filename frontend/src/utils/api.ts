@@ -1,4 +1,8 @@
-import type { RecommendationRequest, RecommendationsResponse } from "../types/parking";
+import type {
+  HealthResponse,
+  RecommendationRequest,
+  RecommendationsResponse,
+} from "../types/parking";
 
 // In local Vite dev, default to the backend on port 8000.
 // In production/serverless, keep same-origin unless explicitly overridden.
@@ -27,4 +31,8 @@ export function getRecommendations(
     method: "POST",
     body: JSON.stringify(request),
   });
+}
+
+export function getHealth(): Promise<HealthResponse> {
+  return apiFetch<HealthResponse>("/health");
 }

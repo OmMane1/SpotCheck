@@ -38,6 +38,19 @@ export interface RecommendationsResponse {
   rejection_reasons: string[]; // populated when results is empty
 }
 
+export interface HealthResponse {
+  status: string;
+  service: string;
+  data_refresh: {
+    enabled: boolean;
+    succeeded: boolean;
+    used_fallback: boolean;
+    refreshed_at: string | null;
+    sources_checked: string[];
+    errors: string[];
+  };
+}
+
 // Preset destinations for SearchForm (avoids live geocoding dependency)
 export interface PresetDestination {
   label: string;
