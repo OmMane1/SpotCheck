@@ -83,7 +83,7 @@ export default function SegmentLayer({ results, selectedId, onSelect }: SegmentL
                   <span>💰 {result.pricing}</span>
                   <span>⏱ {formatDuration(result.max_duration_minutes)}</span>
                 </div>
-                <p className="pin-popup-hint">See full details in the sidebar →</p>
+                <p className="pin-popup-hint">← See full details in the sidebar</p>
               </div>
             </Popup>
           </Marker>

@@ -100,7 +100,7 @@ function Legend() {
 
   return (
     <div className="map-legend">
-      {items.map(({ color, label }) => (
+      {items.map(({ color, label }, index) => (
         <div key={label} className="legend-item">
           <div style={{
             width: 20, height: 20, background: color,
@@ -109,7 +109,7 @@ function Legend() {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 9, fontWeight: 800, color: "white",
           }}>
-            {items.indexOf({ color, label }) + 1}
+            {index + 1}
           </div>
           <span>{label}</span>
         </div>

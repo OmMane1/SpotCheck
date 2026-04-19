@@ -3,14 +3,22 @@ import SearchForm from "./components/SearchForm";
 import Map from "./components/Map";
 import RuleCard from "./components/RuleCard";
 import ResultsList from "./components/ResultsList";
+import ParkingFilterBar, { type ParkingFilter } from "./components/ParkingFilter";
 import { useParking } from "./hooks/useParking";
-import type { RecommendationRequest, LatLng } from "./types/parking";
+import type { RecommendationRequest, LatLng, RecommendationResult } from "./types/parking";
+
+function applyFilter(results: RecommendationResult[], filter: ParkingFilter): RecommendationResult[] {
+  if (filter === "free") return results.filter((r) => r.pricing === "Free");
+  if (filter === "paid") return results.filter((r) => r.pricing !== "Free");
+  return results;
+}
 
 export default function App() {
   const { results, loading, error, search } = useParking();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [formCollapsed, setFormCollapsed] = useState(false);
   const [destination, setDestination] = useState<LatLng | null>(null);
+  const [parkingFilter, setParkingFilter] = useState<ParkingFilter>("any");
 
   function handleSearch(request: RecommendationRequest) {
     setSelectedId(null);
@@ -19,8 +27,9 @@ export default function App() {
     search(request);
   }
 
-  function handleSegmentSelect(id: string) {
-    setSelectedId(id);
+  function handleFilterChange(f: ParkingFilter) {
+    setParkingFilter(f);
+    setSelectedId(null);
   }
 
   function handleBack() {
@@ -32,8 +41,10 @@ export default function App() {
     setFormCollapsed(false);
   }
 
-  const selectedResult = results?.results.find((r) => r.segment_id === selectedId) ?? null;
-  const selectedRank = selectedResult ? results!.results.indexOf(selectedResult) : 0;
+  const allResults = results?.results ?? [];
+  const filteredResults = applyFilter(allResults, parkingFilter);
+  const selectedResult = filteredResults.find((r) => r.segment_id === selectedId) ?? null;
+  const selectedRank = selectedResult ? filteredResults.indexOf(selectedResult) : 0;
 
   return (
     <div className="app-layout">
@@ -55,6 +66,10 @@ export default function App() {
           <div className="sidebar-loading">Searching Fenway…</div>
         )}
 
+        {!loading && results && (
+          <ParkingFilterBar value={parkingFilter} onChange={handleFilterChange} />
+        )}
+
         {!loading && selectedResult ? (
           <RuleCard
             result={selectedResult}
@@ -64,21 +79,21 @@ export default function App() {
           />
         ) : !loading && results ? (
           <ResultsList
-            results={results.results}
+            results={filteredResults}
             rejectionReasons={results.rejection_reasons}
             selectedId={selectedId}
-            onSelect={handleSegmentSelect}
+            onSelect={setSelectedId}
           />
         ) : null}
       </aside>
 
       <main className="map-container">
         <Map
-          results={results?.results ?? []}
+          results={filteredResults}
           selectedId={selectedId}
           selectedResult={selectedResult}
           destination={destination}
-          onSegmentSelect={handleSegmentSelect}
+          onSegmentSelect={setSelectedId}
         />
       </main>
     </div>
