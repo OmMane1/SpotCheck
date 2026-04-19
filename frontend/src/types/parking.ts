@@ -35,6 +35,7 @@ export interface RecommendationsResponse {
   evaluated_at: string;
   results: RecommendationResult[]; // sorted ascending by score (index 0 = best)
   message: string;
+  rejection_reasons: string[]; // populated when results is empty
 }
 
 // Preset destinations for SearchForm (avoids live geocoding dependency)

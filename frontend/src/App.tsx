@@ -65,6 +65,7 @@ export default function App() {
         ) : !loading && results ? (
           <ResultsList
             results={results.results}
+            rejectionReasons={results.rejection_reasons}
             selectedId={selectedId}
             onSelect={handleSegmentSelect}
           />

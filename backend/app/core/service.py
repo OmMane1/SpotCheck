@@ -28,10 +28,14 @@ class ParkingRecommendationService:
         self, request: ParkingRecommendationRequest
     ) -> RecommendationsResponse:
         results: list[RecommendationResult] = []
+        rejection_reasons: list[str] = []
 
         for segment in self.collection.segments:
             evaluation = evaluate_segment(segment, request)
             if not evaluation.is_legal:
+                for reason in evaluation.risk_warnings:
+                    if reason not in rejection_reasons:
+                        rejection_reasons.append(reason)
                 continue
 
             distance_meters = calculate_distance_meters(
@@ -66,7 +70,7 @@ class ParkingRecommendationService:
         message = (
             "Found legal parking options near your destination."
             if top_results
-            else "No legal parking options found for that time and duration."
+            else "No legal parking found for this time and duration."
         )
 
         return RecommendationsResponse(
@@ -74,4 +78,5 @@ class ParkingRecommendationService:
             evaluated_at=request.arrival_time,
             results=top_results,
             message=message,
+            rejection_reasons=rejection_reasons if not top_results else [],
         )

@@ -323,12 +323,39 @@ body {
 }
 
 .results-empty {
-  padding: 20px 16px;
+  padding: 16px;
   font-size: 14px;
   color: var(--text-muted);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+}
+
+.results-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--danger);
+  margin: 0;
+}
+
+.rejection-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--illegal-bg);
+  border: 1px solid var(--illegal-border);
+  border-radius: 6px;
+  padding: 10px 10px 10px 26px;
+  list-style: disc;
+}
+
+.results-empty-hint {
+  font-size: 12px;
+  font-style: italic;
 }
 
 .result-card {

@@ -102,3 +102,4 @@ class RecommendationsResponse(BaseModel):
     evaluated_at: datetime
     results: list[RecommendationResult]
     message: str
+    rejection_reasons: list[str] = []  # populated when results is empty

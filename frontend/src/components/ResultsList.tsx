@@ -3,16 +3,25 @@ import { scoreToColor, scoreToLabel, rankLabel } from "../utils/colors";
 
 interface ResultsListProps {
   results: RecommendationResult[];
+  rejectionReasons: string[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
-export default function ResultsList({ results, selectedId, onSelect }: ResultsListProps) {
+export default function ResultsList({ results, rejectionReasons, selectedId, onSelect }: ResultsListProps) {
   if (results.length === 0) {
     return (
       <div className="results-empty">
-        <p>No legal parking found for this time and duration.</p>
-        <p className="muted">Try adjusting your arrival time or duration.</p>
+        <p className="results-empty-title">No legal parking found</p>
+        <p className="muted">Here's why all spots are blocked right now:</p>
+        {rejectionReasons.length > 0 && (
+          <ul className="rejection-list">
+            {rejectionReasons.map((reason, i) => (
+              <li key={i}>{reason}</li>
+            ))}
+          </ul>
+        )}
+        <p className="muted results-empty-hint">Try adjusting your arrival time or shortening your duration.</p>
       </div>
     );
   }

@@ -5,8 +5,8 @@ import SegmentLayer from "./SegmentLayer";
 import type { RecommendationResult, LatLng } from "../types/parking";
 
 const FENWAY_CENTER: [number, number] = [42.3467, -71.0972];
-const DEFAULT_ZOOM = 16;
-const MIN_ZOOM = 15;
+const DEFAULT_ZOOM = 17;
+const MIN_ZOOM = 16;
 const MAX_ZOOM = 18;
 // Tight bounds — keeps view inside Fenway, blocks Cambridge/South End drift
 const FENWAY_BOUNDS: [[number, number], [number, number]] = [
