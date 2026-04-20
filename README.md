@@ -4,7 +4,7 @@
 
 **Real-time, rule-aware street parking recommendations for Fenway, Boston.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black?logo=vercel)](https://spot-check.vercel.app)
+
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -283,9 +283,8 @@ Data confidence levels: `curated` (hand-researched) → `mixed` (partial live en
 
 | Name | Role |
 |---|---|
-| Om Mane | Backend, deployment, architecture |
-| Sumit | Frontend, map integration, UI |
+| Sumit Kanu | Backend, deployment, architecture |
+| Om Mane | Frontend, map integration, UI |
 
 ---
 
-*Built at a 3-hour hackathon. Deployed to production.*
