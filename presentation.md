@@ -1,8 +1,5 @@
 # SpotCheck — Technical Deep-Dive
 ## Parking Recommendation System for Fenway Park, Boston
-### CEO Technical Interview
-
----
 ---
 
 ## Section 1: Project Overview
@@ -11,11 +8,11 @@
 
 ### The Problem
 
-Boston's Fenway neighbourhood has some of the most complex street parking rules in the city. Rules change by **day of week**, **time of day**, **season**, and **resident permit zone**. A visitor who parks legally at 6pm may return at 8pm to find a ticket — not because they did anything wrong, but because a new restriction kicked in during their visit.
+Boston's Fenway neighbourhood has some of the most complex street parking rules in the city. Rules change by **day of week**, **time of day**, **season**, and **resident permit zone**.
 
 **Why Boston specifically is hard:**
-- Meter zones, sweeping bans, and resident permit areas overlap on the same block — each with different hours and seasonal rules
-- Rules vary by side of street, day of week, and time of year — no single source presents them together
+- Meter zones, sweeping bans, and resident permit areas overlap on the same block
+- Rules vary by side of street, day of week, and time of year
 - No consumer product evaluates all these constraints against a visitor's specific arrival time and duration
 
 **The target user:** Anyone visiting Fenway Park — for a game, a concert, a restaurant — who needs to park on the street and avoid a ticket.
@@ -119,7 +116,7 @@ The frontend and backend live in the **same Vercel project, same domain** — el
 ---
 ---
 
-## Section 3: Backend Deep-Dive
+## Section 3: Backend
 
 ---
 
@@ -174,7 +171,7 @@ Every segment that passes all five checks receives a composite score:
 ---
 ---
 
-## Section 4: Frontend Deep-Dive
+## Section 4: Frontend
 
 ---
 
@@ -204,55 +201,7 @@ The solution is a React component that **renders nothing** but lives inside the 
 
 ---
 
-### Environment-Aware API Configuration
-
-Three deployment contexts, handled cleanly without conditionals:
-
-- **Explicit `.env` override** — points to any backend (staging, local)
-- **Vite dev mode, no override** — defaults to `http://localhost:8000`
-- **Production build** — empty string, calls same origin, routes to the Vercel serverless function
-
-Vite's built-in dev proxy forwards API paths to the local backend — no CORS needed in either environment.
-
----
----
-
-## Section 5: Technical Challenges & Solutions
-
----
-
-### Challenge 1: Python 3.14 Breaking the Production Build
-
-**The problem:** Vercel's build machines defaulted to Python 3.14. `pydantic-core` includes a compiled Rust extension that only supported Python up to 3.13 — the build failed completely.
-
-**The solution:** A single environment variable in the Vercel build config forces the package installer to use Python 3.12, where pre-built wheels exist and no compilation is needed.
-
-**What we learned:** File-based version pins are ignored when the package installer runs in isolated build directories. In CI/CD, explicit environment variables are always more reliable.
-
----
-
-### Challenge 2: The Committed `.env` File
-
-**The problem:** A local environment file with `http://localhost:8000` was committed to the repo. Vite embeds environment variables at build time, so the production bundle hardcoded a reference to a developer's laptop. It worked locally and failed for everyone else.
-
-**The solution:** Remove the file from git tracking, add it to `.gitignore`, and fall back gracefully when the variable is absent.
-
-**What we learned:** `.gitignore` should exist before the first environment file is created — not added after something breaks in production.
-
----
-
-### Challenge 3: Bridging Leaflet and React
-
-**The problem:** Leaflet's map instance is imperative and lives outside React's component lifecycle. There's no clean way to call `map.flyTo()` in response to a state change without breaking the React model.
-
-**The solution:** A React component that renders nothing — it exists only inside the Leaflet map tree, where it can access the map instance and fire imperative calls as React side effects.
-
-**Why it matters:** Map animations stay in sync with React state, no concerns leak across boundaries, and the pattern is reusable for any Leaflet interaction that needs to respond to state.
-
----
----
-
-## Section 6: Scaling Considerations
+## Section 5: Scaling Considerations
 
 ---
 
@@ -262,7 +211,7 @@ The recommendation engine is pure in-memory computation — sub-millisecond per 
 
 ---
 
-### The Path to Citywide Scale
+### To Scale
 
 **Step 1 — PostgreSQL + PostGIS for the data layer**
 At 1,000+ segments, in-memory evaluation of every segment per request becomes impractical. PostGIS enables a geospatial pre-filter: return only the 20 nearest segments before the rule engine runs. The rule engine itself doesn't change.
@@ -274,20 +223,3 @@ A nightly pipeline fetches Boston.gov data, builds an enriched dataset, and writ
 Parking rules change slowly — a cache keyed on segment + day + hour eliminates redundant computation. Integrating Boston's parking terminal API adds occupancy data, upgrading recommendations from "legally available" to "legally available and likely open."
 
 ---
----
-
-## Section 7: Technical Highlights
-
----
-
-| Highlight | What It Is | Why It Matters |
-|---|---|---|
-| **Haversine Distance** | Great-circle distance on Earth's curved surface | Correct at any geographic scale; foundational CS/math |
-| **String Time Comparison** | `"HH:MM"` strings compared directly | Lexicographic order equals chronological order — elegant, no datetime overhead |
-| **Fail-Fast Rule Engine** | First violation exits immediately, ordered by frequency × cost | Cheap checks eliminate most segments before expensive ones run |
-| **Null-Rendering Component** | React component that renders nothing but runs Leaflet side effects | Bridges imperative Leaflet with declarative React cleanly |
-| **Static-First Enrichment** | Live data overlays a curated base — service never depends on third parties | Third-party outages don't take the service down |
-
----
-
-*SpotCheck — Built in 3 hours. Deployed to production. Designed to scale.*
