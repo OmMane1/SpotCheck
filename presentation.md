@@ -34,7 +34,6 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 | **Deployment** | Vercel | Serverless function + static hosting, single domain |
 
 ---
----
 
 ## Section 2: System Architecture
 
@@ -110,7 +109,6 @@ The frontend and backend live in the **same Vercel project, same domain** — el
 | **Single Vercel project** | Frontend and backend share a domain — no CORS configuration needed anywhere | Backend and frontend must deploy together; can't release them independently |
 
 ---
----
 
 ## Section 3: Backend
 
@@ -164,7 +162,7 @@ Every segment that passes all five checks receives a composite score:
 
 **Error handling:** The API returns HTTP 200 even with zero results. "No legal spots" is a valid business outcome, not an error — and the `rejection_reasons` array ("Street sweeping until 11am", "Permit required on 3 segments") is as valuable to the user as a positive result.
 
----
+
 ---
 
 ## Section 4: Frontend
