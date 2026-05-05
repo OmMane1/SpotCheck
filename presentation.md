@@ -103,7 +103,6 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 |---|---|---|
 | **In-memory JSON, no database** | 15 segments fit entirely in memory - zero I/O latency per request | Data updates require a redeployment; can't scale to thousands of segments without pre-filtering |
 | **Static-first enrichment** | Live Boston.gov data is a bonus, not a dependency - service runs perfectly on curated data alone | Live enrichment runs at cold-start, adding latency; the right fix is a nightly pre-bake pipeline |
-| **Single Vercel project** | Frontend and backend share a domain - no CORS configuration needed anywhere | Backend and frontend must deploy together; can't release them independently |
 
 ---
 
