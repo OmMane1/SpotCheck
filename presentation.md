@@ -31,7 +31,6 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 | **Maps** | Leaflet.js | Interactive map, custom rank markers |
 | **Backend API** | FastAPI + Pydantic v2 (Python 3.12) | Request validation, recommendation logic |
 | **Data** | Curated JSON + Boston.gov live enrichment | Base dataset + live meter and sweeping rules |
-| **Deployment** | Vercel | Serverless function + static hosting, single domain |
 
 ---
 
@@ -60,8 +59,6 @@ Results are displayed on an interactive map with colour-coded markers, walk time
   Base JSON    Enrichment    Boston.gov
   (always)     Overrides     (startup)
 ```
-
-The frontend and backend live in the **same Vercel project, same domain** — eliminating CORS entirely in production.
 
 ---
 
