@@ -11,7 +11,7 @@ Boston's Fenway neighbourhood has some of the most complex street parking rules 
 - Rules vary by side of street, day of week, and time of year
 - No consumer product evaluates all these constraints against a visitor's specific arrival time and duration
 
-**The target user:** Anyone visiting Fenway Park — for a game, a concert, a restaurant — who needs to park on the street and avoid a ticket.
+**The target user:** Anyone visiting Fenway Park - for a game, a concert, a restaurant - who needs to park on the street and avoid a ticket.
 
 ---
 
@@ -75,9 +75,9 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 - Returns structured results with human-readable explanations and risk warnings
 
 **Data Layer**
-- `fenway_segments.json` — hand-curated base, always present, version-controlled
-- `enrichments/` — JSON overrides that patch specific segment rules by ID
-- `boston_live.py` — fetches live Boston.gov data at startup; if any source fails, the service falls back to the layer below without interruption
+- `fenway_segments.json` - hand-curated base, always present, version-controlled
+- `enrichments/` - JSON overrides that patch specific segment rules by ID
+- `boston_live.py` - fetches live Boston.gov data at startup; if any source fails, the service falls back to the layer below without interruption
 
 ---
 
@@ -85,11 +85,11 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 
 **1.** User selects a preset landmark, arrival time, duration, and permit status.
 
-**2.** Frontend sends `POST /recommendations` — destination coordinates, ISO timestamp, duration in minutes, permit flag.
+**2.** Frontend sends `POST /recommendations` - destination coordinates, ISO timestamp, duration in minutes, permit flag.
 
 **3.** Backend validates the request shape and normalises the arrival time to `America/New_York`.
 
-**4.** The rule engine runs five sequential checks on each segment. First failure exits immediately — legal segments continue to scoring.
+**4.** The rule engine runs five sequential checks on each segment. First failure exits immediately - legal segments continue to scoring.
 
 **5.** Legal segments are scored (65% proximity + 20% risk + 15% demand), sorted, and the top five are returned with walk times, pricing, summaries, and warnings.
 
@@ -101,9 +101,9 @@ Results are displayed on an interactive map with colour-coded markers, walk time
 
 | Decision | Why We Made It | Trade-Off |
 |---|---|---|
-| **In-memory JSON, no database** | 15 segments fit entirely in memory — zero I/O latency per request | Data updates require a redeployment; can't scale to thousands of segments without pre-filtering |
-| **Static-first enrichment** | Live Boston.gov data is a bonus, not a dependency — service runs perfectly on curated data alone | Live enrichment runs at cold-start, adding latency; the right fix is a nightly pre-bake pipeline |
-| **Single Vercel project** | Frontend and backend share a domain — no CORS configuration needed anywhere | Backend and frontend must deploy together; can't release them independently |
+| **In-memory JSON, no database** | 15 segments fit entirely in memory - zero I/O latency per request | Data updates require a redeployment; can't scale to thousands of segments without pre-filtering |
+| **Static-first enrichment** | Live Boston.gov data is a bonus, not a dependency - service runs perfectly on curated data alone | Live enrichment runs at cold-start, adding latency; the right fix is a nightly pre-bake pipeline |
+| **Single Vercel project** | Frontend and backend share a domain - no CORS configuration needed anywhere | Backend and frontend must deploy together; can't release them independently |
 
 ---
 
@@ -123,17 +123,17 @@ Each street **segment** captures everything needed to evaluate legality at a giv
 
 ### Rule Evaluation Engine
 
-Five checks run in sequence. The first failure exits immediately — no partial passes.
+Five checks run in sequence. The first failure exits immediately - no partial passes.
 
 | Check | What It Tests | Why This Position |
 |---|---|---|
-| **1. Time window** | Active window exists for this day and time? | Most common failure — cheapest to check |
+| **1. Time window** | Active window exists for this day and time? | Most common failure - cheapest to check |
 | **2. Duration** | Stay fits within the maximum allowed? | Second most common; simple arithmetic |
 | **3. Permit** | Window requires a permit the user lacks? | Less common; only fails a subset |
-| **4. No-parking overlap** | Stay overlaps a sweeping or restriction window (with seasonal date logic)? | Most expensive — saved for last |
-| **5. Upcoming restriction** | Restriction starts within 90 min of departure? | Warning only — never fails legality |
+| **4. No-parking overlap** | Stay overlaps a sweeping or restriction window (with seasonal date logic)? | Most expensive - saved for last |
+| **5. Upcoming restriction** | Restriction starts within 90 min of departure? | Warning only - never fails legality |
 
-The order mirrors failure frequency crossed with compute cost — the most common failure is always checked first, at the lowest possible cost.
+The order mirrors failure frequency crossed with compute cost - the most common failure is always checked first, at the lowest possible cost.
 
 ---
 
@@ -141,23 +141,23 @@ The order mirrors failure frequency crossed with compute cost — the most commo
 
 Every segment that passes all five checks receives a composite score:
 
-> **Score = 65% × Proximity + 20% × Risk + 15% × Demand** — lower is better
+> **Score = 65% × Proximity + 20% × Risk + 15% × Demand** - lower is better
 
-- **Proximity (65%)** normalises against a 300-metre threshold. Beyond that, all spots are treated as equally far — risk and demand become the tiebreakers. Proximity dominates because it's what users care about most.
+- **Proximity (65%)** normalises against a 300-metre threshold. Beyond that, all spots are treated as equally far - risk and demand become the tiebreakers. Proximity dominates because it's what users care about most.
 - **Risk (20%)** starts from a base rate and increases for metered spots, mixed-signage areas, and each risk warning generated. A warning-free spot always outranks a warning-heavy one at equal distance.
-- **Demand (15%)** averages traffic and POI pressure — a proxy for whether an open space will actually be available. Walk time is shown instead of raw distance because it's immediately actionable (distance ÷ 80 m/min, conservative pace).
+- **Demand (15%)** averages traffic and POI pressure - a proxy for whether an open space will actually be available. Walk time is shown instead of raw distance because it's immediately actionable (distance ÷ 80 m/min, conservative pace).
 
 ---
 
 ### API Design
 
-**`GET /health`** — Service status and a report on the most recent enrichment: sources checked, successes, and any errors.
+**`GET /health`** - Service status and a report on the most recent enrichment: sources checked, successes, and any errors.
 
-**`POST /recommendations`** — Returns up to five ranked results, or an empty list with `rejection_reasons` explaining exactly what the user should change.
+**`POST /recommendations`** - Returns up to five ranked results, or an empty list with `rejection_reasons` explaining exactly what the user should change.
 
-**Why FastAPI:** Pydantic validation runs automatically on every request; response serialisation is automatic; OpenAPI docs are generated at `/docs` with no extra work. Type hints are first-class throughout — the codebase is self-documenting.
+**Why FastAPI:** Pydantic validation runs automatically on every request; response serialisation is automatic; OpenAPI docs are generated at `/docs` with no extra work. Type hints are first-class throughout - the codebase is self-documenting.
 
-**Error handling:** The API returns HTTP 200 even with zero results. "No legal spots" is a valid business outcome, not an error — and the `rejection_reasons` array ("Street sweeping until 11am", "Permit required on 3 segments") is as valuable to the user as a positive result.
+**Error handling:** The API returns HTTP 200 even with zero results. "No legal spots" is a valid business outcome, not an error - and the `rejection_reasons` array ("Street sweeping until 11am", "Permit required on 3 segments") is as valuable to the user as a positive result.
 
 
 ---
@@ -168,7 +168,7 @@ Every segment that passes all five checks receives a composite score:
 
 ### Component Architecture
 
-`App.tsx` owns all application state — results, loading, selected segment, filter, form visibility. Every child component is purely presentational: it receives props and fires callbacks, holding no shared state of its own. There's no Redux or Context — plain `useState` cleanly handles a single-page, single-session app.
+`App.tsx` owns all application state - results, loading, selected segment, filter, form visibility. Every child component is purely presentational: it receives props and fires callbacks, holding no shared state of its own. There's no Redux or Context - plain `useState` cleanly handles a single-page, single-session app.
 
 **`useParking` custom hook** extracts the async fetch lifecycle so `App.tsx` calls `search(request)` and reads back `{ results, loading, error }` without knowing anything about HTTP or error handling. The hook is independently testable and reusable.
 
@@ -176,11 +176,11 @@ Every segment that passes all five checks receives a composite score:
 
 ### Key UX Decisions
 
-**Preset landmarks instead of geocoding** — Geocoding APIs require paid keys. Six hand-curated coordinates cover every Fenway arrival point with zero cost and deterministic results. A geocoding API can return different results for the same query on different days.
+**Preset landmarks instead of geocoding** - Geocoding APIs require paid keys. Six hand-curated coordinates cover every Fenway arrival point with zero cost and deterministic results. A geocoding API can return different results for the same query on different days.
 
-**Colour-coded markers instead of raw scores** — Green (≤ 0.35), amber (≤ 0.60), red (> 0.60) communicate quality instantly. A score of `0.312` means nothing to a user; colour means everything.
+**Colour-coded markers instead of raw scores** - Green (≤ 0.35), amber (≤ 0.60), red (> 0.60) communicate quality instantly. A score of `0.312` means nothing to a user; colour means everything.
 
-**Walk time instead of distance** — "1.8 minutes" is a decision; "142 metres" requires mental conversion. The map fly-to animation on selection creates the spatial connection between the list and the map — the moment the app feels like a product.
+**Walk time instead of distance** - "1.8 minutes" is a decision; "142 metres" requires mental conversion. The map fly-to animation on selection creates the spatial connection between the list and the map - the moment the app feels like a product.
 
 ---
 
@@ -188,7 +188,7 @@ Every segment that passes all five checks receives a composite score:
 
 Leaflet is imperative (`map.flyTo()`). React is declarative. They conflict.
 
-The solution is a React component that **renders nothing** but lives inside the Leaflet map container, where it can access the live map instance. When the selected segment changes, it fires the Leaflet call as a React side effect. Map animations are driven by React state — no imperative code leaks outside the map boundary.
+The solution is a React component that **renders nothing** but lives inside the Leaflet map container, where it can access the live map instance. When the selected segment changes, it fires the Leaflet call as a React side effect. Map animations are driven by React state - no imperative code leaks outside the map boundary.
 
 ---
 
@@ -198,19 +198,19 @@ The solution is a React component that **renders nothing** but lives inside the 
 
 ### Current Ceiling
 
-The recommendation engine is pure in-memory computation — sub-millisecond per segment, no database I/O. The architecture handles roughly **50,000 requests/day** on Vercel's free tier comfortably. The bottleneck is cold-start enrichment latency, not the core logic.
+The recommendation engine is pure in-memory computation - sub-millisecond per segment, no database I/O. The architecture handles roughly **50,000 requests/day** on Vercel's free tier comfortably. The bottleneck is cold-start enrichment latency, not the core logic.
 
 ---
 
 ### To Scale
 
-**Step 1 — PostgreSQL + PostGIS for the data layer**
+**Step 1 - PostgreSQL + PostGIS for the data layer**
 At 1,000+ segments, in-memory evaluation of every segment per request becomes impractical. PostGIS enables a geospatial pre-filter: return only the 20 nearest segments before the rule engine runs. The rule engine itself doesn't change.
 
-**Step 2 — Move enrichment offline**
-A nightly pipeline fetches Boston.gov data, builds an enriched dataset, and writes it back. The serverless function loads the pre-built file — cold-start drops from ~3 seconds to under 100ms, and Boston.gov is never in the request path.
+**Step 2 - Move enrichment offline**
+A nightly pipeline fetches Boston.gov data, builds an enriched dataset, and writes it back. The serverless function loads the pre-built file - cold-start drops from ~3 seconds to under 100ms, and Boston.gov is never in the request path.
 
-**Step 3 — Caching + real-time occupancy**
-Parking rules change slowly — a cache keyed on segment + day + hour eliminates redundant computation. Integrating Boston's parking terminal API adds occupancy data, upgrading recommendations from "legally available" to "legally available and likely open."
+**Step 3 - Caching + real-time occupancy**
+Parking rules change slowly - a cache keyed on segment + day + hour eliminates redundant computation. Integrating Boston's parking terminal API adds occupancy data, upgrading recommendations from "legally available" to "legally available and likely open."
 
 ---
