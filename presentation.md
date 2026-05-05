@@ -1,7 +1,3 @@
-# SpotCheck — Technical Deep-Dive
-## Parking Recommendation System for Fenway Park, Boston
----
-
 ## Section 1: Project Overview
 
 ---
